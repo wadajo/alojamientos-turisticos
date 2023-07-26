@@ -1,9 +1,5 @@
 type Query {
-    alojamientosTuristicos: AlojamientosTuristicosResponseDto
-}
-
-type AlojamientosTuristicosResponseDto {
-    data: [AlojamientoTuristico]
+    alojamientosTuristicos: [AlojamientoTuristico]
 }
 
 type AlojamientoTuristico {

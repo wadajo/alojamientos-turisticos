@@ -1,9 +1,11 @@
 package com.wadajo.turismomadrid.application.controller;
 
-import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
+import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristico;
 import com.wadajo.turismomadrid.domain.service.TurismoService;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
 
 @Controller
 public class TurismoGraphqlController {
@@ -15,7 +17,7 @@ public class TurismoGraphqlController {
     }
 
     @QueryMapping
-    AlojamientosTuristicosResponseDto alojamientosTuristicos(){
+    List<AlojamientoTuristico> alojamientosTuristicos(){
         return service.getAlojamientosTuristicos();
     }
 
