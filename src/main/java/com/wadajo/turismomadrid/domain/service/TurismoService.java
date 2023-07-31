@@ -35,7 +35,7 @@ public class TurismoService {
         }
     }
 
-    private static AlojamientosTuristicosResponseDto getResponseRaw() {
+    private AlojamientosTuristicosResponseDto getResponseRaw() {
         var client= RestClient.create(ALOJAMIENTOS_URL);
         var responseRaw = client
                 .get()
