@@ -1,19 +1,19 @@
 package com.wadajo.turismomadrid.domain.dto.cmadrid.enums;
 
 public enum TipoAlojamiento {
-    APART_TURISTICO("APART-TURISTICO"),
-    APARTAMENTO_RURAL("APARTAMENTO RURAL"),
-    CAMPING("CAMPING"),
-    CASA_HUESPEDES("CASA HUESPEDES"),
-    CASA_RURAL("CASA RURAL"),
-    HOSTAL("HOSTAL"),
-    HOSTERIAS("HOSTERIAS"),
-    HOTEL("HOTEL"),
-    HOTEL_APART("HOTEL-APART."),
-    HOTEL_RURAL("HOTEL RURAL"),
-    PENSION("PENSION"),
-    VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU");
+    APART_TURISTICO("APART-TURISTICO","Apartamento turístico"),
+    APARTAMENTO_RURAL("APARTAMENTO RURAL","Apartamento rural"),
+    CAMPING("CAMPING","Camping"),
+    CASA_HUESPEDES("CASA HUESPEDES","Casa de huéspedes"),
+    CASA_RURAL("CASA RURAL","Casa rural"),
+    HOSTAL("HOSTAL","Hostal"),
+    HOSTERIAS("HOSTERIAS","Hostería"),
+    HOTEL("HOTEL","Hotel"),
+    HOTEL_APART("HOTEL-APART.","Apart-hotel"),
+    HOTEL_RURAL("HOTEL RURAL","Hotel rural"),
+    PENSION("PENSION","Pensión"),
+    VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU","Vivienda de uso turístico (Airbnb o sim)");
 
-    TipoAlojamiento(String literalValueRaw) {
+    TipoAlojamiento(String literalValueRaw, String printValue) {
     }
 }

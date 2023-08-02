@@ -1,5 +1,5 @@
 type Query {
-    alojamientosTuristicos: [AlojamientoTuristicoRaw]
+    alojamientosTuristicos: [AlojamientoTuristico]
 }
 
 type AlojamientoTuristicoRaw {
@@ -15,4 +15,23 @@ type AlojamientoTuristicoRaw {
     denominacion:String,
     cdpostal:String,
     localidad:String,
+}
+
+type AlojamientoTuristico {
+    alojamiento_tipo:TipoAlojamiento,
+    via_tipo:String,
+    via_nombre:String,
+    numero:String,
+    portal:String,
+    bloque:String
+    planta:String,
+    puerta:String,
+    escalera:String,
+    denominacion:String,
+    cdpostal:String,
+    localidad:String,
+}
+
+enum TipoAlojamiento{
+    APART_TURISTICO, APARTAMENTO_RURAL, CAMPING, CASA_HUESPEDES, CASA_RURAL, HOSTAL, HOSTERIAS, HOTEL, HOTEL_APART, HOTEL_RURAL, PENSION, VIVIENDAS_TURISTICAS
 }
