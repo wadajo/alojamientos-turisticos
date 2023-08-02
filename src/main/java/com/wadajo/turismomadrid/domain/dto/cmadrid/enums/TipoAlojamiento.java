@@ -14,6 +14,6 @@ public enum TipoAlojamiento {
     PENSION("PENSION"),
     VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU");
 
-    TipoAlojamiento(String literalValue) {
+    TipoAlojamiento(String literalValueRaw) {
     }
 }

@@ -1,6 +1,6 @@
 package com.wadajo.turismomadrid.domain.dto.cmadrid;
 
-public record AlojamientoTuristico(String puerta,
+public record AlojamientoTuristicoRaw(String puerta,
                                    String numero,
                                    String alojamiento_tipo,
                                    String escalera,

@@ -1,8 +1,8 @@
 type Query {
-    alojamientosTuristicos: [AlojamientoTuristico]
+    alojamientosTuristicos: [AlojamientoTuristicoRaw]
 }
 
-type AlojamientoTuristico {
+type AlojamientoTuristicoRaw {
     alojamiento_tipo:String,
     via_tipo:String,
     via_nombre:String,
