@@ -52,43 +52,57 @@ public class TurismoService {
         AtomicLong hotelesRurales = new AtomicLong();
         AtomicLong pensiones = new AtomicLong();
         AtomicLong viviendasTuristicas = new AtomicLong();
+
         for (AlojamientoTuristico unAlojamiento : listaFinal){
-            if (unAlojamiento instanceof ApartamentoRural ap) {
-                apartamentosRurales.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+ap.alojamiento_tipo());
-            } else if (unAlojamiento instanceof ApartTuristico at){
-                apartTuristicos.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+at.alojamiento_tipo());
-            } else if (unAlojamiento instanceof Camping c){
-                campings.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+c.alojamiento_tipo());
-            } else if (unAlojamiento instanceof CasaHuespedes ch){
-                casasHuespedes.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+ch.alojamiento_tipo());
-            } else if (unAlojamiento instanceof CasaRural cr){
-                casasRurales.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+cr.alojamiento_tipo());
-            } else if (unAlojamiento instanceof Hostal ho){
-                hostales.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+ho.alojamiento_tipo());
-            } else if (unAlojamiento instanceof Hosteria he){
-                hosterias.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+he.alojamiento_tipo());
-            } else if (unAlojamiento instanceof Hotel hl){
-                hoteles.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+hl.alojamiento_tipo());
-            } else if (unAlojamiento instanceof HotelApart ha){
-                apartHoteles.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+ha.alojamiento_tipo());
-            } else if (unAlojamiento instanceof HotelRural hr){
-                hotelesRurales.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+hr.alojamiento_tipo());
-            } else if (unAlojamiento instanceof Pension p){
-                pensiones.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+p.alojamiento_tipo());
-            } else if (unAlojamiento instanceof ViviendaTuristica vt){
-                viviendasTuristicas.incrementAndGet();
-                LOGGER.log(Level.INFO,"Contado un "+vt.alojamiento_tipo());
+            switch (unAlojamiento){
+                case ApartamentoRural apartamentoRural -> {
+                    apartamentosRurales.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+apartamentoRural.alojamiento_tipo());
+                }
+                case ApartTuristico apartTuristico -> {
+                    apartTuristicos.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+apartTuristico.alojamiento_tipo());
+                }
+                case Camping camping -> {
+                    campings.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+camping.alojamiento_tipo());
+                }
+                case CasaHuespedes casaHuespedes -> {
+                    casasHuespedes.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+casaHuespedes.alojamiento_tipo());
+                }
+                case CasaRural casaRural -> {
+                    casasRurales.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+casaRural.alojamiento_tipo());
+                }
+                case Hostal hostal -> {
+                    hostales.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+hostal.alojamiento_tipo());
+                }
+                case Hosteria hosteria -> {
+                    hosterias.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+hosteria.alojamiento_tipo());
+                }
+                case Hotel hotel -> {
+                    hoteles.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+hotel.alojamiento_tipo());
+                }
+                case HotelApart hotelApart -> {
+                    apartHoteles.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+hotelApart.alojamiento_tipo());
+                }
+                case HotelRural hotelRural -> {
+                    hotelesRurales.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+hotelRural.alojamiento_tipo());
+                }
+                case Pension pension -> {
+                    pensiones.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+pension.alojamiento_tipo());
+                }
+                case ViviendaTuristica viviendaTuristica -> {
+                    viviendasTuristicas.incrementAndGet();
+                    LOGGER.log(Level.INFO,"Contado un "+viviendaTuristica.alojamiento_tipo());
+                }
             }
         }
             mapa.put(TipoAlojamiento.APARTAMENTO_RURAL.toString(),apartamentosRurales);
@@ -103,7 +117,7 @@ public class TurismoService {
             mapa.put(TipoAlojamiento.HOTEL_RURAL.toString(),hotelesRurales);
             mapa.put(TipoAlojamiento.PENSION.toString(),pensiones);
             mapa.put(TipoAlojamiento.VIVIENDAS_TURISTICAS.toString(),viviendasTuristicas);
-            LOGGER.log(Level.INFO,"Resultado: "+ mapa);
+            LOGGER.log(Level.INFO,"Resultado: Total alojamientos turísticos: "+listaFinal.size()+". "+ mapa);
     }
 
     private AlojamientosTuristicosResponseDto getResponseRaw() {

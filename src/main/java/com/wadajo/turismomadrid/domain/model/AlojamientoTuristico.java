@@ -2,7 +2,7 @@ package com.wadajo.turismomadrid.domain.model;
 
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 
-public sealed class AlojamientoTuristico permits ApartTuristico, ApartamentoRural, Camping, CasaHuespedes, CasaRural, Hostal, Hosteria, Hotel, HotelApart, HotelRural, Pension, ViviendaTuristica {
+public sealed abstract class AlojamientoTuristico permits ApartTuristico, ApartamentoRural, Camping, CasaHuespedes, CasaRural, Hostal, Hosteria, Hotel, HotelApart, HotelRural, Pension, ViviendaTuristica {
     public AlojamientoTuristico(String via_tipo, String via_nombre, String numero, String portal, String bloque, String planta, String puerta, String escalera, String denominacion, String cdpostal, String localidad) {
         this.via_tipo = via_tipo;
         this.via_nombre = via_nombre;
