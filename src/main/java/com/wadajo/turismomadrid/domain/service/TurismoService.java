@@ -3,7 +3,7 @@ package com.wadajo.turismomadrid.domain.service;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
-import com.wadajo.turismomadrid.domain.model.*;
+import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,51 +55,51 @@ public class TurismoService {
 
         for (AlojamientoTuristico unAlojamiento : listaFinal){
             switch (unAlojamiento){
-                case ApartamentoRural apartamentoRural -> {
+                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
                     apartamentosRurales.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+apartamentoRural.alojamiento_tipo());
                 }
-                case ApartTuristico apartTuristico -> {
+                case AlojamientoTuristico.ApartTuristico apartTuristico -> {
                     apartTuristicos.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+apartTuristico.alojamiento_tipo());
                 }
-                case Camping camping -> {
+                case AlojamientoTuristico.Camping camping -> {
                     campings.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+camping.alojamiento_tipo());
                 }
-                case CasaHuespedes casaHuespedes -> {
+                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
                     casasHuespedes.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+casaHuespedes.alojamiento_tipo());
                 }
-                case CasaRural casaRural -> {
+                case AlojamientoTuristico.CasaRural casaRural -> {
                     casasRurales.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+casaRural.alojamiento_tipo());
                 }
-                case Hostal hostal -> {
+                case AlojamientoTuristico.Hostal hostal -> {
                     hostales.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+hostal.alojamiento_tipo());
                 }
-                case Hosteria hosteria -> {
+                case AlojamientoTuristico.Hosteria hosteria -> {
                     hosterias.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+hosteria.alojamiento_tipo());
                 }
-                case Hotel hotel -> {
+                case AlojamientoTuristico.Hotel hotel -> {
                     hoteles.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+hotel.alojamiento_tipo());
                 }
-                case HotelApart hotelApart -> {
+                case AlojamientoTuristico.HotelApart hotelApart -> {
                     apartHoteles.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+hotelApart.alojamiento_tipo());
                 }
-                case HotelRural hotelRural -> {
+                case AlojamientoTuristico.HotelRural hotelRural -> {
                     hotelesRurales.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+hotelRural.alojamiento_tipo());
                 }
-                case Pension pension -> {
+                case AlojamientoTuristico.Pension pension -> {
                     pensiones.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+pension.alojamiento_tipo());
                 }
-                case ViviendaTuristica viviendaTuristica -> {
+                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
                     viviendasTuristicas.incrementAndGet();
                     LOGGER.log(Level.INFO,"Contado un "+viviendaTuristica.alojamiento_tipo());
                 }
@@ -132,7 +132,7 @@ public class TurismoService {
         var alojamientosTuristicos=new ArrayList<AlojamientoTuristico>();
         listaRaw.forEach(alojamientoTuristicoRaw -> {
             switch (alojamientoTuristicoRaw.alojamiento_tipo()) {
-                case "APARTAMENTO RURAL" -> alojamientosTuristicos.add(new ApartamentoRural(
+                case "APARTAMENTO RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.ApartamentoRural(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -143,9 +143,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.APARTAMENTO_RURAL
                 ));
-                case "APART-TURISTICO" -> alojamientosTuristicos.add(new ApartTuristico(
+                case "APART-TURISTICO" -> alojamientosTuristicos.add(new AlojamientoTuristico.ApartTuristico(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -156,9 +157,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.APART_TURISTICO
                 ));
-                case "CAMPING" -> alojamientosTuristicos.add(new Camping(
+                case "CAMPING" -> alojamientosTuristicos.add(new AlojamientoTuristico.Camping(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -169,9 +171,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.CAMPING
                 ));
-                case "CASA HUESPEDES" -> alojamientosTuristicos.add(new CasaHuespedes(
+                case "CASA HUESPEDES" -> alojamientosTuristicos.add(new AlojamientoTuristico.CasaHuespedes(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -182,9 +185,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.CASA_HUESPEDES
                 ));
-                case "CASA RURAL" -> alojamientosTuristicos.add(new CasaRural(
+                case "CASA RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.CasaRural(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -195,9 +199,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.CASA_RURAL
                 ));
-                case "HOSTAL" -> alojamientosTuristicos.add(new Hostal(
+                case "HOSTAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hostal(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -208,9 +213,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.HOSTAL
                 ));
-                case "HOSTERIAS" -> alojamientosTuristicos.add(new Hosteria(
+                case "HOSTERIAS" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hosteria(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -221,9 +227,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.HOSTERIAS
                 ));
-                case "HOTEL" -> alojamientosTuristicos.add(new Hotel(
+                case "HOTEL" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hotel(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -234,9 +241,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.HOTEL
                 ));
-                case "HOTEL-APART." -> alojamientosTuristicos.add(new HotelApart(
+                case "HOTEL-APART." -> alojamientosTuristicos.add(new AlojamientoTuristico.HotelApart(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -247,9 +255,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.HOTEL_APART
                 ));
-                case "HOTEL RURAL" -> alojamientosTuristicos.add(new HotelRural(
+                case "HOTEL RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.HotelRural(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -260,9 +269,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.HOTEL_RURAL
                 ));
-                case "PENSION" -> alojamientosTuristicos.add(new Pension(
+                case "PENSION" -> alojamientosTuristicos.add(new AlojamientoTuristico.Pension(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -273,9 +283,10 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.PENSION
                 ));
-                case "VIVIENDAS DE USO TU " -> alojamientosTuristicos.add(new ViviendaTuristica(
+                case "VIVIENDAS DE USO TU " -> alojamientosTuristicos.add(new AlojamientoTuristico.ViviendaTuristica(
                         alojamientoTuristicoRaw.via_tipo(),
                         alojamientoTuristicoRaw.via_nombre(),
                         alojamientoTuristicoRaw.numero(),
@@ -286,7 +297,8 @@ public class TurismoService {
                         alojamientoTuristicoRaw.escalera(),
                         alojamientoTuristicoRaw.denominacion(),
                         alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad()
+                        alojamientoTuristicoRaw.localidad(),
+                        TipoAlojamiento.VIVIENDAS_TURISTICAS
                 ));
             }
         });
