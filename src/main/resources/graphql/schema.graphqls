@@ -2,6 +2,11 @@ type Query {
     alojamientosTuristicos: [AlojamientoTuristico]
 }
 
+type Mutation {
+    guardar: String
+    borrarTodo: String
+}
+
 type AlojamientoTuristicoRaw {
     alojamiento_tipo:String,
     via_tipo:String,

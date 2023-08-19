@@ -2,6 +2,7 @@ package com.wadajo.turismomadrid.application.controller;
 
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import com.wadajo.turismomadrid.domain.service.TurismoService;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -19,6 +20,17 @@ public class TurismoGraphqlController {
     @QueryMapping
     List<AlojamientoTuristico> alojamientosTuristicos(){
         return service.getAlojamientosTuristicos();
+    }
+
+    @MutationMapping
+    String guardar(){
+        return service.guardarAlojamientosEnDb();
+    }
+
+    @MutationMapping
+    String borrarTodo(){
+        service.borrarTodo();
+        return "Borrados";
     }
 
 }
