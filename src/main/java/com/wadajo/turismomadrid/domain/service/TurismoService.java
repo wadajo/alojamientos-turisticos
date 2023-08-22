@@ -11,12 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,8 +30,11 @@ public class TurismoService {
 
     private final AlojamientosMongoRepository repository;
 
-    public TurismoService(AlojamientosMongoRepository repository) {
+    private final ConversionService conversionService;
+
+    public TurismoService(AlojamientosMongoRepository repository, ConversionService conversionService) {
         this.repository = repository;
+        this.conversionService = conversionService;
     }
 
     @Cacheable("alojamientos")
@@ -51,74 +54,40 @@ public class TurismoService {
 
     public String guardarAlojamientosEnDb(){
         var todosLosAlojamientos=getAlojamientosTuristicos();
-        AtomicLong guardados=new AtomicLong();
+        AtomicLong cuentaDeGuardados=new AtomicLong();
+        var alojamientosAGuardar=new ArrayList<AlojamientoDocument>();
 
         for (AlojamientoTuristico unAlojamiento : todosLosAlojamientos) {
-            AlojamientoDocument nuevo=new AlojamientoDocument();
+            AlojamientoDocument nuevo=conversionService.convert(unAlojamiento, AlojamientoDocument.class);
             switch (unAlojamiento) {
-                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
-                    nuevo = new AlojamientoDocument(apartamentoRural.via_tipo(), apartamentoRural.via_nombre(), apartamentoRural.numero(), apartamentoRural.portal(), apartamentoRural.bloque(), apartamentoRural.planta(), apartamentoRural.puerta(), apartamentoRural.escalera(), apartamentoRural.denominacion(), apartamentoRural.cdpostal(), apartamentoRural.localidad(), TipoAlojamiento.APARTAMENTO_RURAL, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + apartamentoRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.ApartTuristico apartTuristico -> {
-                    nuevo = new AlojamientoDocument(apartTuristico.via_tipo(), apartTuristico.via_nombre(), apartTuristico.numero(), apartTuristico.portal(), apartTuristico.bloque(), apartTuristico.planta(), apartTuristico.puerta(), apartTuristico.escalera(), apartTuristico.denominacion(), apartTuristico.cdpostal(), apartTuristico.localidad(), TipoAlojamiento.APART_TURISTICO, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + apartTuristico.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Camping camping -> {
-                    nuevo = new AlojamientoDocument(camping.via_tipo(), camping.via_nombre(), camping.numero(), camping.portal(), camping.bloque(), camping.planta(), camping.puerta(), camping.escalera(), camping.denominacion(), camping.cdpostal(), camping.localidad(), TipoAlojamiento.CAMPING, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + camping.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
-                    nuevo = new AlojamientoDocument(casaHuespedes.via_tipo(), casaHuespedes.via_nombre(), casaHuespedes.numero(), casaHuespedes.portal(), casaHuespedes.bloque(), casaHuespedes.planta(), casaHuespedes.puerta(), casaHuespedes.escalera(), casaHuespedes.denominacion(), casaHuespedes.cdpostal(), casaHuespedes.localidad(), TipoAlojamiento.CASA_HUESPEDES, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + casaHuespedes.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.CasaRural casaRural -> {
-                    nuevo = new AlojamientoDocument(casaRural.via_tipo(), casaRural.via_nombre(), casaRural.numero(), casaRural.portal(), casaRural.bloque(), casaRural.planta(), casaRural.puerta(), casaRural.escalera(), casaRural.denominacion(), casaRural.cdpostal(), casaRural.localidad(), TipoAlojamiento.CASA_RURAL, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + casaRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hostal hostal -> {
-                    nuevo = new AlojamientoDocument(hostal.via_tipo(), hostal.via_nombre(), hostal.numero(), hostal.portal(), hostal.bloque(), hostal.planta(), hostal.puerta(), hostal.escalera(), hostal.denominacion(), hostal.cdpostal(), hostal.localidad(), TipoAlojamiento.HOSTAL, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + hostal.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hosteria hosteria -> {
-                    nuevo = new AlojamientoDocument(hosteria.via_tipo(), hosteria.via_nombre(), hosteria.numero(), hosteria.portal(), hosteria.bloque(), hosteria.planta(), hosteria.puerta(), hosteria.escalera(), hosteria.denominacion(), hosteria.cdpostal(), hosteria.localidad(), TipoAlojamiento.HOSTERIAS, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + hosteria.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hotel hotel -> {
-                    nuevo = new AlojamientoDocument(hotel.via_tipo(), hotel.via_nombre(), hotel.numero(), hotel.portal(), hotel.bloque(), hotel.planta(), hotel.puerta(), hotel.escalera(), hotel.denominacion(), hotel.cdpostal(), hotel.localidad(), TipoAlojamiento.HOTEL, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + hotel.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.HotelApart hotelApart -> {
-                    nuevo = new AlojamientoDocument(hotelApart.via_tipo(), hotelApart.via_nombre(), hotelApart.numero(), hotelApart.portal(), hotelApart.bloque(), hotelApart.planta(), hotelApart.puerta(), hotelApart.escalera(), hotelApart.denominacion(), hotelApart.cdpostal(), hotelApart.localidad(), TipoAlojamiento.HOTEL_APART, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + hotelApart.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.HotelRural hotelRural -> {
-                    nuevo = new AlojamientoDocument(hotelRural.via_tipo(), hotelRural.via_nombre(), hotelRural.numero(), hotelRural.portal(), hotelRural.bloque(), hotelRural.planta(), hotelRural.puerta(), hotelRural.escalera(), hotelRural.denominacion(), hotelRural.cdpostal(), hotelRural.localidad(), TipoAlojamiento.HOTEL_RURAL, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + hotelRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Pension pension -> {
-                    nuevo = new AlojamientoDocument(pension.via_tipo(), pension.via_nombre(), pension.numero(), pension.portal(), pension.bloque(), pension.planta(), pension.puerta(), pension.escalera(), pension.denominacion(), pension.cdpostal(), pension.localidad(), TipoAlojamiento.PENSION, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + pension.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
-                    nuevo = new AlojamientoDocument(viviendaTuristica.via_tipo(), viviendaTuristica.via_nombre(), viviendaTuristica.numero(), viviendaTuristica.portal(), viviendaTuristica.bloque(), viviendaTuristica.planta(), viviendaTuristica.puerta(), viviendaTuristica.escalera(), viviendaTuristica.denominacion(), viviendaTuristica.cdpostal(), viviendaTuristica.localidad(), TipoAlojamiento.VIVIENDAS_TURISTICAS, LocalDateTime.now());
-                    LOGGER.log(Level.INFO, "Reconocido un  " + viviendaTuristica.alojamiento_tipo());
-                }
+                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> LOGGER.log(Level.INFO, "Reconocido un  " + apartamentoRural.alojamiento_tipo());
+                case AlojamientoTuristico.ApartTuristico apartTuristico -> LOGGER.log(Level.INFO, "Reconocido un  " + apartTuristico.alojamiento_tipo());
+                case AlojamientoTuristico.Camping camping -> LOGGER.log(Level.INFO, "Reconocido un  " + camping.alojamiento_tipo());
+                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> LOGGER.log(Level.INFO, "Reconocido un  " + casaHuespedes.alojamiento_tipo());
+                case AlojamientoTuristico.CasaRural casaRural -> LOGGER.log(Level.INFO, "Reconocido un  " + casaRural.alojamiento_tipo());
+                case AlojamientoTuristico.Hostal hostal -> LOGGER.log(Level.INFO, "Reconocido un  " + hostal.alojamiento_tipo());
+                case AlojamientoTuristico.Hosteria hosteria -> LOGGER.log(Level.INFO, "Reconocido un  " + hosteria.alojamiento_tipo());
+                case AlojamientoTuristico.Hotel hotel -> LOGGER.log(Level.INFO, "Reconocido un  " + hotel.alojamiento_tipo());
+                case AlojamientoTuristico.HotelApart hotelApart -> LOGGER.log(Level.INFO, "Reconocido un  " + hotelApart.alojamiento_tipo());
+                case AlojamientoTuristico.HotelRural hotelRural -> LOGGER.log(Level.INFO, "Reconocido un  " + hotelRural.alojamiento_tipo());
+                case AlojamientoTuristico.Pension pension -> LOGGER.log(Level.INFO, "Reconocido un  " + pension.alojamiento_tipo());
+                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> LOGGER.log(Level.INFO, "Reconocido un  " + viviendaTuristica.alojamiento_tipo());
             }
-            verificarSiExisteYDeLoContrarioGuardarEnDb(nuevo, guardados);
+            verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(nuevo, cuentaDeGuardados, alojamientosAGuardar);
         }
-        LOGGER.log(Level.INFO, "Guardados: "+guardados);
-        return "Guardados en DB: "+ guardados;
+        repository.saveAll(alojamientosAGuardar);
+        LOGGER.log(Level.INFO, "Guardados: "+cuentaDeGuardados);
+        return "Guardados en DB: "+ cuentaDeGuardados;
     }
 
-    private void verificarSiExisteYDeLoContrarioGuardarEnDb(AlojamientoDocument nuevo, AtomicLong guardados) {
+    private void verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(AlojamientoDocument nuevo, AtomicLong cuentaDeGuardados, ArrayList<AlojamientoDocument> alojamientosAGuardar) {
         ExampleMatcher alojamientoMatcher=ExampleMatcher.matchingAll()
                 .withIgnorePaths("id")
                 .withIgnorePaths("timestamp");
         boolean existe=repository.exists(Example.of(nuevo,alojamientoMatcher));
         if(!existe) {
-            repository.save(nuevo);
-            guardados.incrementAndGet();
+            alojamientosAGuardar.add(nuevo);
+            cuentaDeGuardados.incrementAndGet();
         }
     }
 
