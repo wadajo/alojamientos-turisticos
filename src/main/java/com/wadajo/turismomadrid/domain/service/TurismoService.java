@@ -52,10 +52,10 @@ public class TurismoService {
         }
     }
 
-    public String guardarAlojamientosEnDb(){
+    public String actualizarAlojamientosEnDb(){
         var todosLosAlojamientos=getAlojamientosTuristicos();
-        AtomicLong cuentaDeGuardados=new AtomicLong();
-        var alojamientosAGuardar=new ArrayList<AlojamientoDocument>();
+        AtomicLong cuentaDeActualizadosEnDB=new AtomicLong();
+        var alojamientosAActualizar=new ArrayList<AlojamientoDocument>();
 
         for (AlojamientoTuristico unAlojamiento : todosLosAlojamientos) {
             AlojamientoDocument nuevo=conversionService.convert(unAlojamiento, AlojamientoDocument.class);
@@ -73,11 +73,11 @@ public class TurismoService {
                 case AlojamientoTuristico.Pension pension -> LOGGER.log(Level.INFO, "Reconocido un  " + pension.alojamiento_tipo());
                 case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> LOGGER.log(Level.INFO, "Reconocido un  " + viviendaTuristica.alojamiento_tipo());
             }
-            verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(nuevo, cuentaDeGuardados, alojamientosAGuardar);
+            verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(nuevo, cuentaDeActualizadosEnDB, alojamientosAActualizar);
         }
-        repository.saveAll(alojamientosAGuardar);
-        LOGGER.log(Level.INFO, "Guardados: "+cuentaDeGuardados);
-        return "Guardados en DB: "+ cuentaDeGuardados;
+        repository.saveAll(alojamientosAActualizar);
+        LOGGER.log(Level.INFO, "Actualizados en DB: "+cuentaDeActualizadosEnDB);
+        return "Han sido actualizados en DB: "+ cuentaDeActualizadosEnDB+" alojamientos.";
     }
 
     private void verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(AlojamientoDocument nuevo, AtomicLong cuentaDeGuardados, ArrayList<AlojamientoDocument> alojamientosAGuardar) {

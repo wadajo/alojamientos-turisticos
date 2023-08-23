@@ -10,7 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ApartamentoTuristicoAlojamientoDocumentMapper extends Converter<AlojamientoTuristico.ApartTuristico, AlojamientoDocument> {
+public interface ViviendaTuristicaDocumentMapper extends Converter<AlojamientoTuristico.ViviendaTuristica, AlojamientoDocument> {
 
     @Mapping(target = "portal", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "bloque", qualifiedBy = EmptyStringToNull.class)
@@ -18,10 +18,11 @@ public interface ApartamentoTuristicoAlojamientoDocumentMapper extends Converter
     @Mapping(target = "puerta", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "escalera", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "codpostal", source = "cdpostal", qualifiedBy = EmptyStringToNull.class)
-    @Mapping(target = "alojamiento_tipo", constant = "Apartamento turístico")
+    @Mapping(target = "denominacion", qualifiedBy = EmptyStringToNull.class)
+    @Mapping(target = "alojamiento_tipo", constant = "Vivienda turística (Airbnb o sim)")
     @Mapping(target = "timestamp", expression = "java(java.time.LocalDateTime.now())")
     @Override
-    AlojamientoDocument convert(AlojamientoTuristico.ApartTuristico apartTuristico);
+    AlojamientoDocument convert(AlojamientoTuristico.ViviendaTuristica viviendaTuristica);
 
     @EmptyStringToNull
     default String emptyStringToNull(String s) {

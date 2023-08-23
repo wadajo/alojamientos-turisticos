@@ -23,8 +23,8 @@ public class TurismoGraphqlController {
     }
 
     @MutationMapping
-    String guardar(){
-        return service.guardarAlojamientosEnDb();
+    String actualizarDB(){
+        return service.actualizarAlojamientosEnDb();
     }
 
     @MutationMapping
