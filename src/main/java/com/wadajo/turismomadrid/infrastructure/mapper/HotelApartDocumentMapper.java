@@ -1,6 +1,6 @@
 package com.wadajo.turismomadrid.infrastructure.mapper;
 
-import com.wadajo.turismomadrid.domain.document.AlojamientoDocument;
+import com.wadajo.turismomadrid.domain.document.HotelApartDocument;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import org.mapstruct.*;
 import org.springframework.core.convert.converter.Converter;
@@ -10,7 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface HotelApartDocumentMapper extends Converter<AlojamientoTuristico.HotelApart, AlojamientoDocument> {
+public interface HotelApartDocumentMapper extends Converter<AlojamientoTuristico.HotelApart, HotelApartDocument> {
 
     @Mapping(target = "portal", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "bloque", qualifiedBy = EmptyStringToNull.class)
@@ -21,7 +21,7 @@ public interface HotelApartDocumentMapper extends Converter<AlojamientoTuristico
     @Mapping(target = "alojamiento_tipo", constant = "Apart-Hotel")
     @Mapping(target = "timestamp", expression = "java(java.time.LocalDateTime.now())")
     @Override
-    AlojamientoDocument convert(AlojamientoTuristico.HotelApart hotelApart);
+    HotelApartDocument convert(AlojamientoTuristico.HotelApart hotelApart);
 
     @EmptyStringToNull
     default String emptyStringToNull(String s) {

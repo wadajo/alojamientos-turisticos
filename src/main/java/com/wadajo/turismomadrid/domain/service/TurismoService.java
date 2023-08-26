@@ -1,7 +1,7 @@
 package com.wadajo.turismomadrid.domain.service;
 
 import com.wadajo.turismomadrid.application.repository.AlojamientosMongoRepository;
-import com.wadajo.turismomadrid.domain.document.AlojamientoDocument;
+import com.wadajo.turismomadrid.domain.document.*;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
@@ -58,23 +58,60 @@ public class TurismoService {
         var alojamientosAActualizar=new ArrayList<AlojamientoDocument>();
 
         for (AlojamientoTuristico unAlojamiento : todosLosAlojamientos) {
-            AlojamientoDocument nuevo=conversionService.convert(unAlojamiento, AlojamientoDocument.class);
+            AlojamientoDocument nuevoDocument = null;
             switch (unAlojamiento) {
-                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> LOGGER.log(Level.INFO, "Reconocido un  " + apartamentoRural.alojamiento_tipo());
-                case AlojamientoTuristico.ApartTuristico apartTuristico -> LOGGER.log(Level.INFO, "Reconocido un  " + apartTuristico.alojamiento_tipo());
-                case AlojamientoTuristico.Camping camping -> LOGGER.log(Level.INFO, "Reconocido un  " + camping.alojamiento_tipo());
-                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> LOGGER.log(Level.INFO, "Reconocido un  " + casaHuespedes.alojamiento_tipo());
-                case AlojamientoTuristico.CasaRural casaRural -> LOGGER.log(Level.INFO, "Reconocido un  " + casaRural.alojamiento_tipo());
-                case AlojamientoTuristico.Hostal hostal -> LOGGER.log(Level.INFO, "Reconocido un  " + hostal.alojamiento_tipo());
-                case AlojamientoTuristico.Hosteria hosteria -> LOGGER.log(Level.INFO, "Reconocido un  " + hosteria.alojamiento_tipo());
-                case AlojamientoTuristico.Hotel hotel -> LOGGER.log(Level.INFO, "Reconocido un  " + hotel.alojamiento_tipo());
-                case AlojamientoTuristico.HotelApart hotelApart -> LOGGER.log(Level.INFO, "Reconocido un  " + hotelApart.alojamiento_tipo());
-                case AlojamientoTuristico.HotelRural hotelRural -> LOGGER.log(Level.INFO, "Reconocido un  " + hotelRural.alojamiento_tipo());
-                case AlojamientoTuristico.Pension pension -> LOGGER.log(Level.INFO, "Reconocido un  " + pension.alojamiento_tipo());
-                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> LOGGER.log(Level.INFO, "Reconocido un  " + viviendaTuristica.alojamiento_tipo());
+                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
+                    nuevoDocument=conversionService.convert(apartamentoRural, ApartamentoRuralDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + apartamentoRural.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.ApartTuristico apartTuristico -> {
+                    nuevoDocument=conversionService.convert(apartTuristico, ApartTuristicoDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + apartTuristico.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.Camping camping -> {
+                    nuevoDocument=conversionService.convert(camping, CampingDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + camping.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
+                    nuevoDocument=conversionService.convert(casaHuespedes, CasaHuespedesDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + casaHuespedes.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.CasaRural casaRural -> {
+                    nuevoDocument=conversionService.convert(casaRural, CasaRuralDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + casaRural.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.Hostal hostal -> {
+                    nuevoDocument=conversionService.convert(hostal, HostalDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + hostal.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.Hosteria hosteria -> {
+                    nuevoDocument=conversionService.convert(hosteria, HosteriaDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + hosteria.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.Hotel hotel -> {
+                    nuevoDocument=conversionService.convert(hotel, HotelDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + hotel.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.HotelApart hotelApart -> {
+                    nuevoDocument=conversionService.convert(hotelApart, HotelApartDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + hotelApart.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.HotelRural hotelRural -> {
+                    nuevoDocument=conversionService.convert(hotelRural, HotelRuralDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + hotelRural.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.Pension pension -> {
+                    nuevoDocument=conversionService.convert(pension, PensionDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + pension.alojamiento_tipo());
+                }
+                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
+                    nuevoDocument=conversionService.convert(viviendaTuristica, ViviendaTuristicaDocument.class);
+                    LOGGER.log(Level.INFO, "Reconocido un  " + viviendaTuristica.alojamiento_tipo());
+                }
             }
-            verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(nuevo, cuentaDeActualizadosEnDB, alojamientosAActualizar);
+            verificarSiExisteYDeLoContrarioSumarParaGuardarEnDb(nuevoDocument,cuentaDeActualizadosEnDB,alojamientosAActualizar);
         }
+        // TODO crear nuevos repositories, uno para cada tipo de Document, y hacer saveAll distintos dentro de los cases del switch
         repository.saveAll(alojamientosAActualizar);
         LOGGER.log(Level.INFO, "Actualizados en DB: "+cuentaDeActualizadosEnDB);
         return "Han sido actualizados en DB: "+ cuentaDeActualizadosEnDB+" alojamientos.";

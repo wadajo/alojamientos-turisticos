@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Document(collection = "alojamientosturisticos")
-public class AlojamientoDocument {
+public abstract sealed class AlojamientoDocument permits ApartamentoRuralDocument,ApartTuristicoDocument,CampingDocument,CasaHuespedesDocument,CasaRuralDocument,HostalDocument,HosteriaDocument,HotelApartDocument,HotelDocument,HotelRuralDocument,PensionDocument,ViviendaTuristicaDocument{
 
     @Id
     public String id;
