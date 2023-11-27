@@ -70,7 +70,6 @@ public class TurismoService {
 
     @Cacheable("alojamientos")
     public List<AlojamientoTuristico> getAlojamientosTuristicos() {
-        LOGGER.log(Level.INFO,"Dentro del service");
         var responseRaw = getResponseRaw();
         if (null!=responseRaw.data()) {
             var listaRaw = responseRaw.data();
@@ -377,7 +376,7 @@ public class TurismoService {
             mapa.put(TipoAlojamiento.HOTEL_RURAL.toString(),hotelesRurales);
             mapa.put(TipoAlojamiento.PENSION.toString(),pensiones);
             mapa.put(TipoAlojamiento.VIVIENDAS_TURISTICAS.toString(),viviendasTuristicas);
-            LOGGER.log(Level.INFO,"Resultado: Total alojamientos turísticos: "+listaFinal.size()+". "+ mapa);
+            LOGGER.log(Level.INFO,"Resultado: Total alojamientos turisticos: "+listaFinal.size()+". "+ mapa);
     }
 
     private AlojamientosTuristicosResponseDto getResponseRaw() {
@@ -566,20 +565,30 @@ public class TurismoService {
     }
 
     public void borrarTodo() {
-        alojamientosMongoRepository.deleteAll();
         apartamentoRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion apartamentosrurales");
         apartTuristicoMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion apartamentosturisticos");
         campingMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion campings");
         casaHuespedesMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion casasdehuespedes");
         casaRuralMongoRepository.deleteAll();
-        casaRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion casasrurales");
         hostalMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hostales");
         hosteriaMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hosterias");
         hotelApartMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion aparthoteles");
         hotelMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hoteles");
         hotelRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hotelesrurales");
         pensionMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion pensiones");
         viviendaTuristicaMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion viviendasturisticas");
         LOGGER.log(Level.INFO,"Borradas todas las colecciones");
     }
 }
