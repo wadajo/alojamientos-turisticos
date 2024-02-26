@@ -31,7 +31,6 @@ public class TurismoService {
     @Value("${turismomadrid.endpoint.url}")
     private String ALOJAMIENTOS_URL;
 
-    private final AlojamientosMongoRepository alojamientosMongoRepository;
     private final ApartamentoRuralMongoRepository apartamentoRuralMongoRepository;
     private final ApartTuristicoMongoRepository apartTuristicoMongoRepository;
     private final CampingMongoRepository campingMongoRepository;
@@ -51,8 +50,7 @@ public class TurismoService {
             .withIgnorePaths("id")
             .withIgnorePaths("timestamp");
 
-    public TurismoService(AlojamientosMongoRepository alojamientosMongoRepository, ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService) {
-        this.alojamientosMongoRepository = alojamientosMongoRepository;
+    public TurismoService(ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService) {
         this.apartamentoRuralMongoRepository = apartamentoRuralMongoRepository;
         this.apartTuristicoMongoRepository = apartTuristicoMongoRepository;
         this.campingMongoRepository = campingMongoRepository;
