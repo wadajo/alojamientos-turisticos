@@ -12,7 +12,7 @@ public enum TipoAlojamiento {
     HOTEL_APART("HOTEL-APART.","Apart-hotel"),
     HOTEL_RURAL("HOTEL RURAL","Hotel rural"),
     PENSION("PENSION","Pensión"),
-    VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU","Vivienda de uso turístico (Airbnb o sim)");
+    VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU ","Vivienda de uso turístico (Airbnb o sim)");
 
     private final String literalValueRaw;
     private final String printValue;
