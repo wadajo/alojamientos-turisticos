@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.internal.Files;
 import com.wadajo.turismomadrid.TurismoAcceptanceBase;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,16 +18,10 @@ import static org.hamcrest.Matchers.containsString;
 
 class TurismoAcceptanceTests extends TurismoAcceptanceBase {
 
-    @Value("${wiremock.server.baseUrl}")
-    private String wireMockUrl;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
     @Test
     void debeDevolverTodosLosAlojamientosTuristicosAlPedirLaQuery() throws IOException {
         String alojamientosQueryString = Files.read(new File(ALOJAMIENTOS_QUERY_FILE), Charset.defaultCharset());
-        JsonNode alojamientosJsonResponse = objectMapper.readTree(new File(ALOJAMIENTOS_RESPONSE_FILE));
+        JsonNode alojamientosJsonResponse = new ObjectMapper().readTree(new File(ALOJAMIENTOS_RESPONSE_FILE));
 
         stubFor(post(urlEqualTo("/graphql"))
                 .withRequestBody(equalTo(alojamientosQueryString))
