@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.wadajo.turismomadrid.util.Constants.ALOJAMIENTOS_QUERY_FILE;
-import static com.wadajo.turismomadrid.util.Constants.ALOJAMIENTOS_RESPONSE_FILE;
+import static com.wadajo.turismomadrid.util.Constants.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 
@@ -37,6 +36,28 @@ class TurismoAcceptanceTests extends TurismoAcceptanceBase {
         .then()
                 .statusCode(200)
                 .body(containsString(alojamientosJsonResponse.asText()));
+
+    }
+
+    @Test
+    void debeBorrarTodosLosAlojamientosTuristicosAlEjecutarElBorrarTodo() throws IOException {
+        String mutationBorrarTodo = Files.read(new File(ALOJAMIENTOS_BORRAR_FILE), Charset.defaultCharset());
+        JsonNode borrarJsonResponse = new ObjectMapper().readTree(new File(BORRAR_RESPONSE_FILE));
+
+        stubFor(post(urlEqualTo("/graphql"))
+                .withRequestBody(equalTo(mutationBorrarTodo))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withJsonBody(borrarJsonResponse)
+                ));
+
+        given()
+                .body(mutationBorrarTodo)
+                .when()
+                .post(wireMockUrl+"/graphql")
+                .then()
+                .statusCode(200)
+                .body(containsString(borrarJsonResponse.asText()));
 
     }
 
