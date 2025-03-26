@@ -1,0 +1,16 @@
+query AlojamientosTuristicos {
+                alojamientosTuristicos {
+                    alojamiento_tipo
+                    via_tipo
+                    via_nombre
+                    numero
+                    portal
+                    bloque
+                    planta
+                    puerta
+                    escalera
+                    denominacion
+                    cdpostal
+                    localidad
+                }
+            }
