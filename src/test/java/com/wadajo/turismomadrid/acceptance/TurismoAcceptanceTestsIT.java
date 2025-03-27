@@ -2,16 +2,13 @@ package com.wadajo.turismomadrid.acceptance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jknack.handlebars.internal.Files;
 import com.wadajo.turismomadrid.TurismoAcceptanceBaseIT;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.system.CapturedOutput;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.wadajo.turismomadrid.util.Constants.*;
@@ -46,25 +43,25 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
     }
 
     @Test
-    @Disabled("TODO")
-    void debeBorrarTodosLosAlojamientosTuristicosAlEjecutarElBorrarTodo() throws IOException {
-        String mutationBorrarTodo = Files.read(new File(ALOJAMIENTOS_BORRAR_FILE), Charset.defaultCharset());
-        JsonNode borrarJsonResponse = new ObjectMapper().readTree(new File(BORRAR_RESPONSE_FILE));
+    void debeBorrarTodosLosAlojamientosTuristicosAlEjecutarElBorrarTodo(CapturedOutput output) throws IOException {
+        JsonNode mutationBorrarTodoJson = new ObjectMapper().readTree(new File(ALOJAMIENTOS_BORRAR_FILE));
 
         stubFor(post(urlEqualTo("/graphql"))
-                .withRequestBody(equalTo(mutationBorrarTodo))
+                .withRequestBody(equalToJson(mutationBorrarTodoJson.toString()))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withJsonBody(borrarJsonResponse)
                 ));
 
         given()
-                .body(mutationBorrarTodo)
-                .when()
+                .body(mutationBorrarTodoJson)
+                .contentType(ContentType.JSON)
+        .when()
                 .post(String.format("http://localhost:%s/graphql",port))
-                .then()
-                .statusCode(200)
-                .body(containsString(borrarJsonResponse.asText()));
+        .then()
+                .statusCode(200);
+
+        assertThat(output.getOut(),
+                containsString("Borradas todas las colecciones"));
 
     }
 
