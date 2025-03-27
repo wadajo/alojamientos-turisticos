@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "puerta": "",
+      "numero": "71",
+      "alojamiento_tipo": "HOTEL",
+      "categoria": "3-HOTEL",
+      "escalera": "",
+      "planta": "",
+      "signatura": "HM-127",
+      "via_nombre": "de la Chopera",
+      "denominacion": "GRAN LEGAZPI",
+      "via_tipo": "PASEO",
+      "cdpostal": "28045",
+      "localidad": "Madrid",
+      "portal": "",
+      "bloque": ""
+    },
+    {
+      "puerta": "",
+      "numero": "13",
+      "alojamiento_tipo": "PENSION",
+      "categoria": "2-PENSION",
+      "escalera": "",
+      "planta": "3ª",
+      "signatura": "HM-132",
+      "via_nombre": "de la Salud",
+      "denominacion": "ISABEL",
+      "via_tipo": "CALLE",
+      "cdpostal": "28013",
+      "localidad": "Madrid",
+      "portal": "",
+      "bloque": ""
+    }
+  ]
+}
