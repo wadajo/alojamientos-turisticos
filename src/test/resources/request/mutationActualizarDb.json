@@ -1,0 +1,3 @@
+{
+  "query": "mutation ActualizarDB { actualizarDB }"
+}
