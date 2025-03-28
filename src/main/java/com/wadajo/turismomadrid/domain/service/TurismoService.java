@@ -1,10 +1,10 @@
 package com.wadajo.turismomadrid.domain.service;
 
+import com.wadajo.turismomadrid.application.AlojamientosClient;
 import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.*;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
-import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import com.wadajo.turismomadrid.infrastructure.configuration.Constants;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.UnknownContentTypeException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,8 +28,6 @@ import static org.apache.logging.log4j.Level.DEBUG;
 public class TurismoService {
 
     private static final Logger LOGGER= LogManager.getLogger();
-
-    private final RestClient restClient;
 
     private final ApartamentoRuralMongoRepository apartamentoRuralMongoRepository;
     private final ApartTuristicoMongoRepository apartTuristicoMongoRepository;
@@ -48,12 +44,13 @@ public class TurismoService {
 
     private final ConversionService conversionService;
 
+    private final AlojamientosClient client;
+
     private final ExampleMatcher alojamientoMatcher=ExampleMatcher.matchingAll()
             .withIgnorePaths("id")
             .withIgnorePaths("timestamp");
 
-    public TurismoService(RestClient restClient, ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService) {
-        this.restClient = restClient;
+    public TurismoService(ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService, AlojamientosClient client) {
         this.apartamentoRuralMongoRepository = apartamentoRuralMongoRepository;
         this.apartTuristicoMongoRepository = apartTuristicoMongoRepository;
         this.campingMongoRepository = campingMongoRepository;
@@ -67,11 +64,12 @@ public class TurismoService {
         this.pensionMongoRepository = pensionMongoRepository;
         this.viviendaTuristicaMongoRepository = viviendaTuristicaMongoRepository;
         this.conversionService = conversionService;
+        this.client = client;
     }
 
     @Cacheable("alojamientos")
     public List<AlojamientoTuristico> getAlojamientosTuristicos() throws ResponseTypeDtoException {
-        var responseRaw = getResponseRaw();
+        var responseRaw = client.getResponseRaw();
         if (Objects.nonNull(responseRaw.data())) {
             var listaRaw = responseRaw.data();
             listaRaw.sort(Comparator.comparing(AlojamientoTuristicoRaw::alojamiento_tipo).thenComparing(AlojamientoTuristicoRaw::cdpostal));
@@ -382,19 +380,6 @@ public class TurismoService {
             LOGGER.log(Level.INFO, message);
     }
 
-    private AlojamientosTuristicosResponseDto getResponseRaw() throws ResponseTypeDtoException {
-        try {
-            var responseOptional = Optional.ofNullable(restClient
-                    .get()
-                    .retrieve()
-                    .body(AlojamientosTuristicosResponseDto.class));
-            return responseOptional
-                    .orElseThrow(() -> new ResponseTypeDtoException("Response from the server was null"));
-        } catch (UnknownContentTypeException e) {
-            throw new ResponseTypeDtoException("Could not serialise the response from the server", e);
-        }
-    }
-
     private List<AlojamientoTuristico> convertFromRaw(List<AlojamientoTuristicoRaw> listaRaw){
         var alojamientosTuristicos=new ArrayList<AlojamientoTuristico>();
         listaRaw.forEach(alojamientoTuristicoRaw -> {
@@ -570,7 +555,7 @@ public class TurismoService {
                 default -> LOGGER.error("not recognized alojamiento tipo: {}", alojamientoTuristicoRaw.alojamiento_tipo());
             }
         });
-        return alojamientosTuristicos;
+        return Collections.unmodifiableList(alojamientosTuristicos);
     }
 
     public void borrarTodo() {

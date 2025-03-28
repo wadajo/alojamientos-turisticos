@@ -19,13 +19,13 @@ public class RestClientConfig {
     private String alojamientosUrl;
 
     @Bean
-    RestClient restClient() {
+    RestClient restClient(RestClient.Builder builder) {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
 
         converter.setSupportedMediaTypes(List.of(MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
         messageConverters.add(converter);
-        return RestClient.builder()
+        return builder
                 .baseUrl(alojamientosUrl)
                 .messageConverters(messageConverters).build();
     }
