@@ -5,4 +5,7 @@ public class Constants {
     public static final String ALOJAMIENTOS_BORRAR_FILE = "src/test/resources/request/mutationBorrarTodo.json";
 
     public static final String ALOJAMIENTOS_RAW_FILE = "src/test/resources/response/alojamientos-raw.json";
+    public static final String ALOJAMIENTOS_RESPONSE_FILE = "src/test/resources/response/alojamientos.json";
+    public static final String BORRAR_RESPONSE_FILE = "src/test/resources/response/borrar.json";
+
 }

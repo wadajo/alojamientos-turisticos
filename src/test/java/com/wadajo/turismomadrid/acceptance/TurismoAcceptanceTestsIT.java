@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wadajo.turismomadrid.TurismoAcceptanceBaseIT;
 import io.restassured.http.ContentType;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.system.CapturedOutput;
 
@@ -22,6 +23,7 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
     void debeDevolverTodosLosAlojamientosTuristicosAlPedirLaQuery(CapturedOutput output) throws IOException {
         JsonNode alojamientosQueryJson = new ObjectMapper().readTree(new File(ALOJAMIENTOS_QUERY_JSON_FILE));
         JsonNode alojamientosRaw = new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_FILE));
+        JsonNode alojamientosResponse = new ObjectMapper().readTree(new File(ALOJAMIENTOS_RESPONSE_FILE));
 
         stubFor(get("/")
                 .willReturn(aResponse()
@@ -34,7 +36,10 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
                 .contentType(ContentType.JSON)
         .when()
                 .post(String.format("http://localhost:%s/graphql",port))
+                .prettyPeek()
         .then()
+                .assertThat()
+                .body(Matchers.equalToCompressingWhiteSpace(alojamientosResponse.toString()))
                 .statusCode(200);
 
         assertThat(output.getOut(),
@@ -45,6 +50,7 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
     @Test
     void debeBorrarTodosLosAlojamientosTuristicosAlEjecutarElBorrarTodo(CapturedOutput output) throws IOException {
         JsonNode mutationBorrarTodoJson = new ObjectMapper().readTree(new File(ALOJAMIENTOS_BORRAR_FILE));
+        JsonNode mutationBorrarTodoResponse = new ObjectMapper().readTree(new File(BORRAR_RESPONSE_FILE));
 
         stubFor(post(urlEqualTo("/graphql"))
                 .withRequestBody(equalToJson(mutationBorrarTodoJson.toString()))
@@ -58,6 +64,8 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
         .when()
                 .post(String.format("http://localhost:%s/graphql",port))
         .then()
+                .assertThat()
+                .body(Matchers.equalToCompressingWhiteSpace(mutationBorrarTodoResponse.toString()))
                 .statusCode(200);
 
         assertThat(output.getOut(),
