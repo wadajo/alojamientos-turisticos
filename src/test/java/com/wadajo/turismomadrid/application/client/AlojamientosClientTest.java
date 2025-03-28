@@ -1,6 +1,7 @@
 package com.wadajo.turismomadrid.application.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 import static com.wadajo.turismomadrid.util.Constants.ALOJAMIENTOS_RAW_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -40,5 +42,14 @@ class AlojamientosClientTest {
         assertThat(responseRaw.data().getFirst().denominacion()).isEqualTo("GRAN LEGAZPI");
     }
 
+    @Test
+    void debeArrojarExcepcionCuandoElServidorRetornaNull() {
+        server
+            .expect(requestTo(""))
+            .andRespond(withSuccess());
+
+        assertThatExceptionOfType(ResponseTypeDtoException.class)
+            .isThrownBy(()-> client.getResponseRaw());
+    }
 
 }
