@@ -12,7 +12,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import java.io.File;
 import java.io.IOException;
 
-import static com.wadajo.turismomadrid.util.Constants.ALOJAMIENTOS_RAW_FILE;
+import static com.wadajo.turismomadrid.util.TestConstants.ALOJAMIENTOS_RAW_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;

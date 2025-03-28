@@ -9,18 +9,23 @@ import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.convert.ConversionService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(OutputCaptureExtension.class)
 class TurismoServiceTest {
 
     @Mock
@@ -111,6 +116,31 @@ class TurismoServiceTest {
         List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
 
         assertThat(result).size().isEqualTo(2);
+    }
+
+    @Test
+    void debeDevolverUnaListaVaciaCuandoEnElServidorNoHayAlojamientos() {
+        when(alojamientosClient.getResponseRaw())
+            .thenReturn(new AlojamientosTuristicosResponseDto(null));
+
+        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void debeLogarUnErrorCuandoNoReconoceElTipoAlojamientoDelRaw(CapturedOutput output) {
+        AlojamientoTuristicoRaw raw = new AlojamientoTuristicoRaw("","2","BIZARRO","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
+        List<AlojamientoTuristicoRaw> rawList = Collections.singletonList(raw);
+        AlojamientosTuristicosResponseDto responseDto = new AlojamientosTuristicosResponseDto(rawList);
+
+        when(alojamientosClient.getResponseRaw())
+                .thenReturn(responseDto);
+
+        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
+
+        assertThat(result).isEmpty();
+        assertThat(output.getOut()).contains("not recognized alojamiento tipo: BIZARRO");
     }
 
 }

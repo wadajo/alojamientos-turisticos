@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.wadajo.turismomadrid.util.Constants.*;
+import static com.wadajo.turismomadrid.util.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -43,22 +43,19 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .prettyPeek()
         .then()
             .assertThat()
-            .body("data.alojamientosTuristicos[0].via_nombre",Matchers.equalTo("de la Chopera"))
+            .body("data.alojamientosTuristicos[0].via_nombre",Matchers.equalTo("del Buen Suceso"))
             .and()
-            .body("data.alojamientosTuristicos[1].via_nombre",Matchers.equalTo("de la Salud"))
+            .body("data.alojamientosTuristicos[1].via_nombre",Matchers.equalTo("de las Seguidillas"))
             .statusCode(200);
 
-        assertThat(output.getOut(),
-            containsString("Resultado: Total alojamientos turisticos: 2. " +
-                "{CASA_RURAL=0, HOTEL_APART=0, APARTAMENTO_RURAL=0, CASA_HUESPEDES=0, HOTEL_RURAL=0, PENSION=1, " +
-                "HOSTERIAS=0, CAMPING=0, HOSTAL=0, VIVIENDAS_TURISTICAS=0, APART_TURISTICO=0, HOTEL=1}"));
+        assertThat(output.getOut(), containsString(RESULTADO_OUT_QUERY));
     }
 
     @Test
     void debeBorrarTodosLosAlojamientosTuristicosAlEjecutarElBorrarTodo(CapturedOutput output) throws IOException {
         JsonNode mutationBorrarTodoJson = new ObjectMapper().readTree(new File(ALOJAMIENTOS_BORRAR_FILE));
 
-        stubFor(post(urlEqualTo("/graphql"))
+        stubFor(post(urlEqualTo(GRAPHQL))
             .withRequestBody(equalToJson(mutationBorrarTodoJson.toString()))
             .willReturn(aResponse()
                     .withStatus(200)
@@ -71,18 +68,17 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .post(String.format("http://localhost:%s/graphql",port))
         .then()
             .assertThat()
-            .body("data.borrarTodo",Matchers.equalTo("Borrados"))
+            .body("data.borrarTodo",Matchers.equalTo(RESULTADO_API_BORRAR))
             .statusCode(200);
 
-        assertThat(output.getOut(),
-            containsString("Borradas todas las colecciones"));
+        assertThat(output.getOut(), containsString(RESULTADO_OUT_BORRAR));
     }
 
     @Test
     void debeActualizarDb(CapturedOutput output) throws IOException {
         JsonNode mutationActualizarDbJson = new ObjectMapper().readTree(new File(ALOJAMIENTOS_ACTUALIZAR_FILE));
 
-        stubFor(post(urlEqualTo("/graphql"))
+        stubFor(post(urlEqualTo(GRAPHQL))
             .withRequestBody(equalToJson(mutationActualizarDbJson.toString()))
             .willReturn(aResponse()
                     .withStatus(200)
@@ -95,12 +91,9 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .post(String.format("http://localhost:%s/graphql",port))
         .then()
             .assertThat()
-            .body("data.actualizarDB", Matchers.equalTo("Han sido actualizados en DB: 2 alojamientos."))
+            .body("data.actualizarDB", Matchers.equalTo(RESULTADO_API_ACTUALIZARDB))
             .statusCode(200);
 
-        assertThat(output.getOut(),
-            containsString("Guardados en DB 1 pensiones"));
-        assertThat(output.getOut(),
-            containsString("Guardados en DB 1 hoteles"));
+        assertThat(output.getOut(), containsString(RESULTADO_OUT_QUERY));
     }
 }

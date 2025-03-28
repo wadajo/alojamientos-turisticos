@@ -47,3 +47,15 @@ tasks.jacocoTestReport {
 		html.required = true
 	}
 }
+
+jacocoTestReport {
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, exclude: [
+							'com/wadajo/turismomadrid/infrastructure/configuration/Constants.class'
+					])
+				})
+		)
+	}
+}
