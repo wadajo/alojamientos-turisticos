@@ -1,6 +1,6 @@
 package com.wadajo.turismomadrid.domain.service;
 
-import com.wadajo.turismomadrid.application.AlojamientosClient;
+import com.wadajo.turismomadrid.application.client.AlojamientosClient;
 import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.*;

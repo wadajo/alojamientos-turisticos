@@ -1,4 +1,4 @@
-package com.wadajo.turismomadrid.application;
+package com.wadajo.turismomadrid.application.client;
 
 import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
@@ -13,8 +13,8 @@ public class AlojamientosClient {
 
     private final RestClient restClient;
 
-    public AlojamientosClient(RestClient restClient) {
-        this.restClient = restClient;
+    public AlojamientosClient(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder.build();
     }
 
     public AlojamientosTuristicosResponseDto getResponseRaw() throws ResponseTypeDtoException {

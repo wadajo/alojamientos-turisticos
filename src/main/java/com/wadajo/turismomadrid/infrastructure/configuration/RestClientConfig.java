@@ -14,19 +14,18 @@ import java.util.List;
 @Configuration
 public class RestClientConfig {
 
-
     @Value("${turismomadrid.endpoint.url}")
     private String alojamientosUrl;
 
     @Bean
-    RestClient restClient(RestClient.Builder builder) {
+    RestClient.Builder restClientBuilder() {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
 
         converter.setSupportedMediaTypes(List.of(MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
         messageConverters.add(converter);
-        return builder
+        return RestClient.builder()
                 .baseUrl(alojamientosUrl)
-                .messageConverters(messageConverters).build();
+                .messageConverters(messageConverters);
     }
 }
