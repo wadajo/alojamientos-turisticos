@@ -1,10 +1,16 @@
 package com.wadajo.turismomadrid.application.controller;
 
+import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import com.wadajo.turismomadrid.domain.service.TurismoService;
+import graphql.GraphQLError;
+import org.springframework.graphql.data.ArgumentValue;
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
 
 import java.util.List;
 
@@ -22,6 +28,18 @@ public class TurismoGraphqlController {
         return service.getAlojamientosTuristicos();
     }
 
+    @QueryMapping
+    List<AlojamientoTuristico> alojamientosTuristicosPorTipo(ArgumentValue<TipoAlojamiento> tipo) throws BindException {
+        if (tipo.isPresent()) {
+            try {
+                return service.getAlojamientosByType(tipo.value());
+            } catch (IllegalArgumentException e) {
+                throw new BindException(tipo, "tipoAlojamiento");
+            }
+        } else {
+            return service.getAlojamientosTuristicos();
+        }
+    }
     @MutationMapping
     String actualizarDB(){
         return service.actualizarAlojamientosEnDb();
@@ -33,4 +51,8 @@ public class TurismoGraphqlController {
         return "Borrados";
     }
 
+    @GraphQlExceptionHandler
+    public GraphQLError handle(BindException ex) {
+        return GraphQLError.newError().errorType(ErrorType.BAD_REQUEST).message(ex.getMessage()).build();
+    }
 }

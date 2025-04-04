@@ -1,5 +1,6 @@
 type Query {
     alojamientosTuristicos: [AlojamientoTuristico]
+    alojamientosTuristicosPorTipo(tipo: String): [AlojamientoTuristico]
 }
 
 type Mutation {

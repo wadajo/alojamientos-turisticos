@@ -12,7 +12,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import java.io.File;
 import java.io.IOException;
 
-import static com.wadajo.turismomadrid.util.TestConstants.ALOJAMIENTOS_RAW_FILE;
+import static com.wadajo.turismomadrid.util.TestConstants.ALOJAMIENTOS_RAW_STUBBING_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -33,7 +33,7 @@ class AlojamientosClientTest {
         server
             .expect(requestTo(""))
             .andRespond(withSuccess(
-                    new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_FILE)).toString(),
+                    new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_STUBBING_FILE)).toString(),
                     MediaType.APPLICATION_JSON));
 
         var responseRaw = client.getResponseRaw();

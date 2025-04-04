@@ -67,22 +67,14 @@ public class TurismoService {
         this.client = client;
     }
 
-    @Cacheable("alojamientos")
     public List<AlojamientoTuristico> getAlojamientosTuristicos() throws ResponseTypeDtoException {
-        var responseRaw = client.getResponseRaw();
-        if (Objects.nonNull(responseRaw.data())) {
-            var listaRaw = responseRaw.data();
-            listaRaw.sort(Comparator.comparing(AlojamientoTuristicoRaw::alojamiento_tipo).thenComparing(AlojamientoTuristicoRaw::cdpostal));
-            var listaFinal=convertFromRaw(listaRaw);
-            generarMapaConLaCuenta(listaFinal);
-            return listaFinal;
-        } else {
-            return Collections.emptyList();
-        }
+        var listaRaw = getAlojamientosTotales();
+        generarMapaConLaCuenta(listaRaw);
+        return listaRaw;
     }
 
     public String actualizarAlojamientosEnDb(){
-        var todosLosAlojamientos=getAlojamientosTuristicos();
+        var todosLosAlojamientos=getAlojamientosTotales();
         AtomicLong cuenta=new AtomicLong();
 
         List<AlojamientoDocument> apartamentosRurales=new ArrayList<>();
@@ -188,7 +180,58 @@ public class TurismoService {
         viviendaTuristicaMongoRepository.saveAll(toViviendaTuristicaDocumentList(viviendasTuristicas));
         LOGGER.log(Level.INFO, "Guardados en DB {} viviendas turísticas.", viviendasTuristicas.size());
 
+        generarMapaConLaCuenta(todosLosAlojamientos);
         return "Han sido actualizados en DB: "+ cuenta+" alojamientos.";
+    }
+
+    public void borrarTodo() {
+        apartamentoRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion apartamentosrurales");
+        apartTuristicoMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion apartamentosturisticos");
+        campingMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion campings");
+        casaHuespedesMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion casasdehuespedes");
+        casaRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion casasrurales");
+        hostalMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hostales");
+        hosteriaMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hosterias");
+        hotelApartMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion aparthoteles");
+        hotelMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hoteles");
+        hotelRuralMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion hotelesrurales");
+        pensionMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion pensiones");
+        viviendaTuristicaMongoRepository.deleteAll();
+        LOGGER.log(DEBUG,"Borrada coleccion viviendasturisticas");
+        LOGGER.log(Level.INFO,"Borradas todas las colecciones");
+    }
+
+    public List<AlojamientoTuristico> getAlojamientosByType(TipoAlojamiento tipo) {
+        var listaFiltrada = getAlojamientosTotales().stream()
+            .filter(alojamientoTuristico ->
+                switch (alojamientoTuristico) {
+                    case AlojamientoTuristico.ApartTuristico apartTuristico -> apartTuristico.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.ApartamentoRural apartamentoRural -> apartamentoRural.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.Camping camping -> camping.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.CasaHuespedes casaHuespedes -> casaHuespedes.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.CasaRural casaRural -> casaRural.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.Hostal hostal -> hostal.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.Hosteria hosteria -> hosteria.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.Hotel hotel -> hotel.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.HotelApart hotelApart -> hotelApart.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.HotelRural hotelRural -> hotelRural.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.Pension pension -> pension.alojamiento_tipo().toString().equals(tipo.toString());
+                    case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> viviendaTuristica.alojamiento_tipo().toString().equals(tipo.toString());
+                })
+            .toList();
+        generarMapaConLaCuenta(listaFiltrada);
+        return listaFiltrada;
     }
 
     private List<ApartamentoRuralDocument> toApartamentoRuralDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
@@ -558,31 +601,16 @@ public class TurismoService {
         return Collections.unmodifiableList(alojamientosTuristicos);
     }
 
-    public void borrarTodo() {
-        apartamentoRuralMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion apartamentosrurales");
-        apartTuristicoMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion apartamentosturisticos");
-        campingMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion campings");
-        casaHuespedesMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion casasdehuespedes");
-        casaRuralMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion casasrurales");
-        hostalMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion hostales");
-        hosteriaMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion hosterias");
-        hotelApartMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion aparthoteles");
-        hotelMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion hoteles");
-        hotelRuralMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion hotelesrurales");
-        pensionMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion pensiones");
-        viviendaTuristicaMongoRepository.deleteAll();
-        LOGGER.log(DEBUG,"Borrada coleccion viviendasturisticas");
-        LOGGER.log(Level.INFO,"Borradas todas las colecciones");
+    @Cacheable("alojamientos")
+    private List<AlojamientoTuristico> getAlojamientosTotales() {
+        var responseRaw = client.getResponseRaw();
+        if (Objects.nonNull(responseRaw.data())) {
+            var listaRaw = responseRaw.data();
+            listaRaw.sort(Comparator.comparing(AlojamientoTuristicoRaw::alojamiento_tipo).thenComparing(AlojamientoTuristicoRaw::cdpostal));
+            return convertFromRaw(listaRaw);
+        } else {
+            return Collections.emptyList();
+        }
     }
+
 }
