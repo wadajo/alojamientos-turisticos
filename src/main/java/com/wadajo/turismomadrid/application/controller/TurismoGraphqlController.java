@@ -29,13 +29,9 @@ public class TurismoGraphqlController {
     }
 
     @QueryMapping
-    List<AlojamientoTuristico> alojamientosTuristicosPorTipo(ArgumentValue<TipoAlojamiento> tipo) throws BindException {
+    List<AlojamientoTuristico> alojamientosTuristicosPorTipo(ArgumentValue<TipoAlojamiento> tipo) {
         if (tipo.isPresent()) {
-            try {
-                return service.getAlojamientosByType(tipo.value());
-            } catch (IllegalArgumentException e) {
-                throw new BindException(tipo, "tipoAlojamiento");
-            }
+            return service.getAlojamientosByType(tipo.value());
         } else {
             return service.getAlojamientosTuristicos();
         }

@@ -112,12 +112,7 @@ class TurismoServiceTest {
 
     @Test
     void debeObtenerLosAlojamientosTuristicos(CapturedOutput output) throws ResponseTypeDtoException {
-        AlojamientoTuristicoRaw raw1 = new AlojamientoTuristicoRaw("","2","HOTEL","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
-        AlojamientoTuristicoRaw raw2 = new AlojamientoTuristicoRaw("","5","HOTEL","3-HOTEL","","","HM-123","del Pez","HOTEL DEL ENSAYO","CALLE","28012","Madrid","","");
-        List<AlojamientoTuristicoRaw> rawList = new ArrayList<>();
-        rawList.add(raw1);
-        rawList.add(raw2);
-        AlojamientosTuristicosResponseDto responseDto = new AlojamientosTuristicosResponseDto(rawList);
+        AlojamientosTuristicosResponseDto responseDto = getResponseDto();
 
         when(alojamientosClient.getResponseRaw())
                 .thenReturn(responseDto);
@@ -156,12 +151,7 @@ class TurismoServiceTest {
 
     @Test
     void debeActualizarAlojamientoEnDbEInformarElResultado(CapturedOutput output) {
-        AlojamientoTuristicoRaw raw1 = new AlojamientoTuristicoRaw("","2","HOTEL","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
-        AlojamientoTuristicoRaw raw2 = new AlojamientoTuristicoRaw("","5","HOTEL","3-HOTEL","","","HM-123","del Pez","HOTEL DEL ENSAYO","CALLE","28012","Madrid","","");
-        List<AlojamientoTuristicoRaw> rawList = new ArrayList<>();
-        rawList.add(raw1);
-        rawList.add(raw2);
-        AlojamientosTuristicosResponseDto responseDto = new AlojamientosTuristicosResponseDto(rawList);
+        AlojamientosTuristicosResponseDto responseDto = getResponseDto();
 
         when(alojamientosClient.getResponseRaw())
             .thenReturn(responseDto);
@@ -172,6 +162,15 @@ class TurismoServiceTest {
         assertThat(output)
             .contains(TestConstants.RESULTADO_OUTPUT_MOCKS)
             .contains("Guardados en DB 2 hoteles.");
+    }
+
+    private static AlojamientosTuristicosResponseDto getResponseDto() {
+        AlojamientoTuristicoRaw raw1 = new AlojamientoTuristicoRaw("","2","HOTEL","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
+        AlojamientoTuristicoRaw raw2 = new AlojamientoTuristicoRaw("","5","HOTEL","3-HOTEL","","","HM-123","del Pez","HOTEL DEL ENSAYO","CALLE","28012","Madrid","","");
+        List<AlojamientoTuristicoRaw> rawList = new ArrayList<>();
+        rawList.add(raw1);
+        rawList.add(raw2);
+        return new AlojamientosTuristicosResponseDto(rawList);
     }
 
 }

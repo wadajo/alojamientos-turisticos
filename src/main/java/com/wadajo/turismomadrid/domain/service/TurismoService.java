@@ -237,96 +237,84 @@ public class TurismoService {
     private List<ApartamentoRuralDocument> toApartamentoRuralDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<ApartamentoRuralDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof ApartamentoRuralDocument document)
-                lista.add(document);
+            lista.add((ApartamentoRuralDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<ApartTuristicoDocument> toApartTuristicoDocumentList(List<AlojamientoDocument> alojamientoDocumentList) {
         List<ApartTuristicoDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof ApartTuristicoDocument document)
-                lista.add(document);
+            lista.add((ApartTuristicoDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<CampingDocument> toCampingDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<CampingDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof CampingDocument document)
-                lista.add(document);
+            lista.add((CampingDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<CasaHuespedesDocument> toCasaHuespedesDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<CasaHuespedesDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof CasaHuespedesDocument document)
-                lista.add(document);
+            lista.add((CasaHuespedesDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<CasaRuralDocument> toCasaRuralDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<CasaRuralDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof CasaRuralDocument document)
-                lista.add(document);
+            lista.add((CasaRuralDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<HostalDocument> toHostalDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<HostalDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof HostalDocument document)
-                lista.add(document);
+            lista.add((HostalDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<HosteriaDocument> toHosteriaDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<HosteriaDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof HosteriaDocument document)
-                lista.add(document);
+            lista.add((HosteriaDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<HotelApartDocument> toHotelApartDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<HotelApartDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof HotelApartDocument document)
-                lista.add(document);
+            lista.add((HotelApartDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<HotelDocument> toHotelDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<HotelDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof HotelDocument document)
-                lista.add(document);
+            lista.add((HotelDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<HotelRuralDocument> toHotelRuralDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<HotelRuralDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof HotelRuralDocument document)
-                lista.add(document);
+            lista.add((HotelRuralDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<PensionDocument> toPensionDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<PensionDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof PensionDocument document)
-                lista.add(document);
+            lista.add((PensionDocument)alojamientoDocument);
         }
         return lista;
     }
     private List<ViviendaTuristicaDocument> toViviendaTuristicaDocumentList(List<? extends AlojamientoDocument> alojamientoDocumentList) {
         List<ViviendaTuristicaDocument> lista=new ArrayList<>();
         for (AlojamientoDocument alojamientoDocument : alojamientoDocumentList) {
-            if (alojamientoDocument instanceof ViviendaTuristicaDocument document)
-                lista.add(document);
+            lista.add((ViviendaTuristicaDocument)alojamientoDocument);
         }
         return lista;
     }
