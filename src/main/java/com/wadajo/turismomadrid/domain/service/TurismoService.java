@@ -1,24 +1,23 @@
 package com.wadajo.turismomadrid.domain.service;
 
-import com.wadajo.turismomadrid.application.client.AlojamientosClient;
 import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.*;
-import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import com.wadajo.turismomadrid.infrastructure.configuration.Constants;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.wadajo.turismomadrid.infrastructure.configuration.Constants.RECONOCIDO_UN;
@@ -44,13 +43,13 @@ public class TurismoService {
 
     private final ConversionService conversionService;
 
-    private final AlojamientosClient client;
+    private final AlojamientosService alojamientosService;
 
     private final ExampleMatcher alojamientoMatcher=ExampleMatcher.matchingAll()
             .withIgnorePaths("id")
             .withIgnorePaths("timestamp");
 
-    public TurismoService(ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService, AlojamientosClient client) {
+    public TurismoService(ApartamentoRuralMongoRepository apartamentoRuralMongoRepository, ApartTuristicoMongoRepository apartTuristicoMongoRepository, CampingMongoRepository campingMongoRepository, CasaHuespedesMongoRepository casaHuespedesMongoRepository, CasaRuralMongoRepository casaRuralMongoRepository, HostalMongoRepository hostalMongoRepository, HosteriaMongoRepository hosteriaMongoRepository, HotelApartMongoRepository hotelApartMongoRepository, HotelMongoRepository hotelMongoRepository, HotelRuralMongoRepository hotelRuralMongoRepository, PensionMongoRepository pensionMongoRepository, ViviendaTuristicaMongoRepository viviendaTuristicaMongoRepository, ConversionService conversionService, AlojamientosService alojamientosService) {
         this.apartamentoRuralMongoRepository = apartamentoRuralMongoRepository;
         this.apartTuristicoMongoRepository = apartTuristicoMongoRepository;
         this.campingMongoRepository = campingMongoRepository;
@@ -64,31 +63,31 @@ public class TurismoService {
         this.pensionMongoRepository = pensionMongoRepository;
         this.viviendaTuristicaMongoRepository = viviendaTuristicaMongoRepository;
         this.conversionService = conversionService;
-        this.client = client;
+        this.alojamientosService = alojamientosService;
     }
 
     public List<AlojamientoTuristico> getAlojamientosTuristicos() throws ResponseTypeDtoException {
-        var listaRaw = getAlojamientosTotales();
+        var listaRaw = alojamientosService.getAlojamientosTotales();
         generarMapaConLaCuenta(listaRaw);
         return listaRaw;
     }
 
     public String actualizarAlojamientosEnDb(){
-        var todosLosAlojamientos=getAlojamientosTotales();
-        AtomicLong cuenta=new AtomicLong();
+        var todosLosAlojamientos = alojamientosService.getAlojamientosTotales();
+        AtomicLong cuenta = new AtomicLong();
 
-        List<AlojamientoDocument> apartamentosRurales=new ArrayList<>();
-        List<AlojamientoDocument> apartTuristicos= new ArrayList<>();
-        List<AlojamientoDocument> campings= new ArrayList<>();
-        List<AlojamientoDocument> casasHuespedes= new ArrayList<>();
-        List<AlojamientoDocument> casasRurales=new ArrayList<>();
-        List<AlojamientoDocument> hostales=new ArrayList<>();
-        List<AlojamientoDocument> hosterias=new ArrayList<>();
-        List<AlojamientoDocument> hoteles=new ArrayList<>();
-        List<AlojamientoDocument> hotelesApart=new ArrayList<>();
-        List<AlojamientoDocument> hotelesRurales=new ArrayList<>();
-        List<AlojamientoDocument> pensiones=new ArrayList<>();
-        List<AlojamientoDocument> viviendasTuristicas=new ArrayList<>();
+        List<AlojamientoDocument> apartamentosRurales = new ArrayList<>();
+        List<AlojamientoDocument> apartTuristicos = new ArrayList<>();
+        List<AlojamientoDocument> campings = new ArrayList<>();
+        List<AlojamientoDocument> casasHuespedes = new ArrayList<>();
+        List<AlojamientoDocument> casasRurales = new ArrayList<>();
+        List<AlojamientoDocument> hostales = new ArrayList<>();
+        List<AlojamientoDocument> hosterias = new ArrayList<>();
+        List<AlojamientoDocument> hoteles = new ArrayList<>();
+        List<AlojamientoDocument> hotelesApart = new ArrayList<>();
+        List<AlojamientoDocument> hotelesRurales = new ArrayList<>();
+        List<AlojamientoDocument> pensiones = new ArrayList<>();
+        List<AlojamientoDocument> viviendasTuristicas = new ArrayList<>();
 
         for (AlojamientoTuristico unAlojamiento : todosLosAlojamientos) {
             switch (unAlojamiento) {
@@ -213,7 +212,7 @@ public class TurismoService {
     }
 
     public List<AlojamientoTuristico> getAlojamientosByType(TipoAlojamiento tipo) {
-        var listaFiltrada = getAlojamientosTotales().stream()
+        var listaFiltrada = alojamientosService.getAlojamientosTotales().stream()
             .filter(alojamientoTuristico ->
                 switch (alojamientoTuristico) {
                     case AlojamientoTuristico.ApartTuristico apartTuristico -> apartTuristico.alojamiento_tipo().toString().equals(tipo.toString());
@@ -319,9 +318,11 @@ public class TurismoService {
         return lista;
     }
 
-    private void verificarAlojamientoDocumentEIncrementarCuenta(AlojamientoDocument alojamientoDocument, List<? super AlojamientoDocument> alojamientoDocumentArrayList, AtomicLong cuenta, MongoRepository repository) {
-        boolean existe= repository.exists(Example.of(alojamientoDocument,alojamientoMatcher));
-        if(!existe) {
+    private <S extends AlojamientoDocument> void verificarAlojamientoDocumentEIncrementarCuenta(S alojamientoDocument,
+                                                                List<? super AlojamientoDocument> alojamientoDocumentArrayList,
+                                                                AtomicLong cuenta,
+                                                                MongoRepository<S, String> repository) {
+        if(!repository.exists(Example.of(alojamientoDocument,alojamientoMatcher))) {
             alojamientoDocumentArrayList.addLast(alojamientoDocument);
             cuenta.incrementAndGet();
         }
@@ -409,196 +410,6 @@ public class TurismoService {
 
             String message = String.format("Resultado: Total alojamientos turisticos: %d. %s", listaFinal.size(), mapa);
             LOGGER.log(Level.INFO, message);
-    }
-
-    private List<AlojamientoTuristico> convertFromRaw(List<AlojamientoTuristicoRaw> listaRaw){
-        var alojamientosTuristicos=new ArrayList<AlojamientoTuristico>();
-        listaRaw.forEach(alojamientoTuristicoRaw -> {
-            switch (alojamientoTuristicoRaw.alojamiento_tipo()) {
-                case "APARTAMENTO RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.ApartamentoRural(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.APARTAMENTO_RURAL
-                ));
-                case "APART-TURISTICO" -> alojamientosTuristicos.add(new AlojamientoTuristico.ApartTuristico(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.APART_TURISTICO
-                ));
-                case "CAMPING" -> alojamientosTuristicos.add(new AlojamientoTuristico.Camping(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.CAMPING
-                ));
-                case "CASA HUESPEDES" -> alojamientosTuristicos.add(new AlojamientoTuristico.CasaHuespedes(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.CASA_HUESPEDES
-                ));
-                case "CASA RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.CasaRural(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.CASA_RURAL
-                ));
-                case "HOSTAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hostal(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.HOSTAL
-                ));
-                case "HOSTERIAS" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hosteria(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.HOSTERIAS
-                ));
-                case "HOTEL" -> alojamientosTuristicos.add(new AlojamientoTuristico.Hotel(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.HOTEL
-                ));
-                case "HOTEL-APART." -> alojamientosTuristicos.add(new AlojamientoTuristico.HotelApart(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.HOTEL_APART
-                ));
-                case "HOTEL RURAL" -> alojamientosTuristicos.add(new AlojamientoTuristico.HotelRural(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.HOTEL_RURAL
-                ));
-                case "PENSION" -> alojamientosTuristicos.add(new AlojamientoTuristico.Pension(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.PENSION
-                ));
-                case "VIVIENDAS DE USO TU " -> alojamientosTuristicos.add(new AlojamientoTuristico.ViviendaTuristica(
-                        alojamientoTuristicoRaw.via_tipo(),
-                        alojamientoTuristicoRaw.via_nombre(),
-                        alojamientoTuristicoRaw.numero(),
-                        alojamientoTuristicoRaw.portal(),
-                        alojamientoTuristicoRaw.bloque(),
-                        alojamientoTuristicoRaw.planta(),
-                        alojamientoTuristicoRaw.puerta(),
-                        alojamientoTuristicoRaw.escalera(),
-                        alojamientoTuristicoRaw.denominacion(),
-                        alojamientoTuristicoRaw.cdpostal(),
-                        alojamientoTuristicoRaw.localidad(),
-                        TipoAlojamiento.VIVIENDAS_TURISTICAS
-                ));
-                default -> LOGGER.error("not recognized alojamiento tipo: {}", alojamientoTuristicoRaw.alojamiento_tipo());
-            }
-        });
-        return Collections.unmodifiableList(alojamientosTuristicos);
-    }
-
-    @Cacheable("alojamientos")
-    private List<AlojamientoTuristico> getAlojamientosTotales() {
-        var responseRaw = client.getResponseRaw();
-        if (Objects.nonNull(responseRaw.data())) {
-            var listaRaw = responseRaw.data();
-            listaRaw.sort(Comparator.comparing(AlojamientoTuristicoRaw::alojamiento_tipo).thenComparing(AlojamientoTuristicoRaw::cdpostal));
-            return convertFromRaw(listaRaw);
-        } else {
-            return Collections.emptyList();
-        }
     }
 
 }

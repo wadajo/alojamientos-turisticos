@@ -5,7 +5,6 @@ import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.HotelDocument;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
-import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
 import com.wadajo.turismomadrid.util.TestConstants;
@@ -74,6 +73,9 @@ class TurismoServiceTest {
     @Mock
     private AlojamientosClient alojamientosClient;
 
+    @Mock
+    private AlojamientosService alojamientosService;
+
     @InjectMocks
     private TurismoService turismoService;
 
@@ -88,6 +90,9 @@ class TurismoServiceTest {
             });
         when(conversionService.convert(Mockito.any(AlojamientoTuristico.Hotel.class), eq(HotelDocument.class)))
             .thenReturn(new HotelDocument());
+
+        when(alojamientosService.getAlojamientosTotales())
+            .thenReturn(getAlojamientosTuristicos());
     }
 
     @Test
@@ -112,11 +117,6 @@ class TurismoServiceTest {
 
     @Test
     void debeObtenerLosAlojamientosTuristicos(CapturedOutput output) throws ResponseTypeDtoException {
-        AlojamientosTuristicosResponseDto responseDto = getResponseDto();
-
-        when(alojamientosClient.getResponseRaw())
-                .thenReturn(responseDto);
-
         List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
 
         assertThat(result).size().isEqualTo(2);
@@ -125,8 +125,8 @@ class TurismoServiceTest {
 
     @Test
     void debeDevolverUnaListaVaciaCuandoEnElServidorNoHayAlojamientos(CapturedOutput output) {
-        when(alojamientosClient.getResponseRaw())
-            .thenReturn(new AlojamientosTuristicosResponseDto(null));
+        when(alojamientosService.getAlojamientosTotales())
+            .thenReturn(Collections.emptyList());
 
         List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
 
@@ -135,27 +135,7 @@ class TurismoServiceTest {
     }
 
     @Test
-    void debeLogarUnErrorCuandoNoReconoceElTipoAlojamientoDelRaw(CapturedOutput output) {
-        AlojamientoTuristicoRaw raw = new AlojamientoTuristicoRaw("","2","BIZARRO","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
-        List<AlojamientoTuristicoRaw> rawList = Collections.singletonList(raw);
-        AlojamientosTuristicosResponseDto responseDto = new AlojamientosTuristicosResponseDto(rawList);
-
-        when(alojamientosClient.getResponseRaw())
-                .thenReturn(responseDto);
-
-        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
-
-        assertThat(result).isEmpty();
-        assertThat(output.getOut()).contains("not recognized alojamiento tipo: BIZARRO");
-    }
-
-    @Test
     void debeActualizarAlojamientoEnDbEInformarElResultado(CapturedOutput output) {
-        AlojamientosTuristicosResponseDto responseDto = getResponseDto();
-
-        when(alojamientosClient.getResponseRaw())
-            .thenReturn(responseDto);
-
         var result = turismoService.actualizarAlojamientosEnDb();
 
         assertThat(result).isEqualTo("Han sido actualizados en DB: 2 alojamientos.");
@@ -164,13 +144,13 @@ class TurismoServiceTest {
             .contains("Guardados en DB 2 hoteles.");
     }
 
-    private static AlojamientosTuristicosResponseDto getResponseDto() {
-        AlojamientoTuristicoRaw raw1 = new AlojamientoTuristicoRaw("","2","HOTEL","3-HOTEL","","","HM-127","del Pez","HOTEL DEL TEST","CALLE","28012","Madrid","","");
-        AlojamientoTuristicoRaw raw2 = new AlojamientoTuristicoRaw("","5","HOTEL","3-HOTEL","","","HM-123","del Pez","HOTEL DEL ENSAYO","CALLE","28012","Madrid","","");
-        List<AlojamientoTuristicoRaw> rawList = new ArrayList<>();
-        rawList.add(raw1);
-        rawList.add(raw2);
-        return new AlojamientosTuristicosResponseDto(rawList);
+    private static List<AlojamientoTuristico> getAlojamientosTuristicos() {
+        AlojamientoTuristico.Hotel hotel1 = new AlojamientoTuristico.Hotel("CALLE","del Pez","2","","","","","","HOTEL DEL TEST","28012","Madrid",TipoAlojamiento.HOTEL);
+        AlojamientoTuristico.Hotel hotel2 = new AlojamientoTuristico.Hotel("CALLE","del Pez","5","","","","","","HOTEL DEL ENSAYO","28012","Madrid",TipoAlojamiento.HOTEL);
+        List<AlojamientoTuristico> alojamientosTuristicos = new ArrayList<>();
+        alojamientosTuristicos.add(hotel1);
+        alojamientosTuristicos.add(hotel2);
+        return alojamientosTuristicos;
     }
 
 }
