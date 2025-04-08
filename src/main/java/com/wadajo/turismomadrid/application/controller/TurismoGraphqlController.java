@@ -24,12 +24,7 @@ public class TurismoGraphqlController {
     }
 
     @QueryMapping
-    List<AlojamientoTuristico> alojamientosTuristicos(){
-        return service.getAlojamientosTuristicos();
-    }
-
-    @QueryMapping
-    List<AlojamientoTuristico> alojamientosTuristicosPorTipo(ArgumentValue<TipoAlojamiento> tipo) {
+    List<AlojamientoTuristico> alojamientosTuristicos(ArgumentValue<TipoAlojamiento> tipo) {
         if (tipo.isPresent()) {
             return service.getAlojamientosByType(tipo.value());
         } else {

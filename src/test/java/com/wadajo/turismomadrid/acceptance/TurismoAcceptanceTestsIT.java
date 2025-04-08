@@ -106,12 +106,11 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .contentType(ContentType.JSON)
         .when()
             .post(String.format("http://localhost:%s/graphql",port))
-            .prettyPeek()
         .then()
             .assertThat()
-            .body("data.alojamientosTuristicosPorTipo[0].via_nombre",Matchers.equalTo("del Buen Suceso"))
+            .body("data.alojamientosTuristicos[0].via_nombre",Matchers.equalTo("del Buen Suceso"))
             .and()
-            .body("data.alojamientosTuristicosPorTipo[0].numero",Matchers.equalTo("3"))
+            .body("data.alojamientosTuristicos[0].numero",Matchers.equalTo("3"))
             .statusCode(200);
 
         assertThat(output.getOut(), Matchers.not(containsString(RESULTADO_BASE_OUT_QUERY)));
@@ -130,9 +129,9 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .prettyPeek()
             .then()
             .assertThat()
-            .body("data.alojamientosTuristicosPorTipo[0].via_nombre",Matchers.equalTo("del Buen Suceso"))
+            .body("data.alojamientosTuristicos[0].via_nombre",Matchers.equalTo("del Buen Suceso"))
             .and()
-            .body("data.alojamientosTuristicosPorTipo[1].via_nombre",Matchers.equalTo("de las Seguidillas"))
+            .body("data.alojamientosTuristicos[1].via_nombre",Matchers.equalTo("de las Seguidillas"))
             .statusCode(200);
 
         assertThat(output.getOut(), containsString(RESULTADO_BASE_OUT_QUERY));
@@ -150,7 +149,7 @@ class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
             .prettyPeek()
             .then()
             .assertThat()
-            .body("data.alojamientosTuristicosPorTipo",nullValue())
+            .body("data.alojamientosTuristicos",nullValue())
             .and()
             .body("errors[0].message", stringContainsInOrder(
                 "rejected value [Horreo]",
