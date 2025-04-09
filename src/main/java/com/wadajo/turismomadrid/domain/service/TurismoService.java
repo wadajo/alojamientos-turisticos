@@ -89,33 +89,34 @@ public class TurismoService {
         List<AlojamientoDocument> pensiones = new ArrayList<>();
         List<AlojamientoDocument> viviendasTuristicas = new ArrayList<>();
 
-        for (AlojamientoTuristico unAlojamiento : todosLosAlojamientos) {
-            switch (unAlojamiento) {
-                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
-                    var apartamentoRuralDocument=conversionService.convert(apartamentoRural, ApartamentoRuralDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, apartamentoRural.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(apartamentoRuralDocument, apartamentosRurales, cuenta, apartamentoRuralMongoRepository);
-                }
-                case AlojamientoTuristico.ApartTuristico apartTuristico -> {
-                    var apartTuristicoDocument=conversionService.convert(apartTuristico, ApartTuristicoDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, apartTuristico.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(apartTuristicoDocument, apartTuristicos, cuenta, apartTuristicoMongoRepository);
-                }
-                case AlojamientoTuristico.Camping camping -> {
-                    var campingDocument=conversionService.convert(camping, CampingDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, camping.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(campingDocument,campings,cuenta,campingMongoRepository);
-                }
-                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
-                    var casaHuespedesDocument=conversionService.convert(casaHuespedes, CasaHuespedesDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, casaHuespedes.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(casaHuespedesDocument,casasHuespedes,cuenta,casaHuespedesMongoRepository);
-                }
-                case AlojamientoTuristico.CasaRural casaRural -> {
-                    var casaRuralDocument=conversionService.convert(casaRural, CasaRuralDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, casaRural.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(casaRuralDocument,casasRurales,cuenta,casaRuralMongoRepository);
-                }
+        todosLosAlojamientos.parallelStream()
+                .forEach(alojamientoTuristico -> {
+                    switch (alojamientoTuristico) {
+                        case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
+                            var apartamentoRuralDocument=conversionService.convert(apartamentoRural, ApartamentoRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartamentoRural.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(apartamentoRuralDocument, apartamentosRurales, cuenta, apartamentoRuralMongoRepository);
+                        }
+                        case AlojamientoTuristico.ApartTuristico apartTuristico -> {
+                            var apartTuristicoDocument=conversionService.convert(apartTuristico, ApartTuristicoDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartTuristico.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(apartTuristicoDocument, apartTuristicos, cuenta, apartTuristicoMongoRepository);
+                        }
+                        case AlojamientoTuristico.Camping camping -> {
+                            var campingDocument=conversionService.convert(camping, CampingDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, camping.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(campingDocument,campings,cuenta,campingMongoRepository);
+                        }
+                        case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
+                            var casaHuespedesDocument=conversionService.convert(casaHuespedes, CasaHuespedesDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaHuespedes.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(casaHuespedesDocument,casasHuespedes,cuenta,casaHuespedesMongoRepository);
+                        }
+                        case AlojamientoTuristico.CasaRural casaRural -> {
+                            var casaRuralDocument=conversionService.convert(casaRural, CasaRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaRural.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(casaRuralDocument,casasRurales,cuenta,casaRuralMongoRepository);
+                        }
                 case AlojamientoTuristico.Hostal hostal -> {
                     var hostalDocument=conversionService.convert(hostal, HostalDocument.class);
                     LOGGER.log(DEBUG, RECONOCIDO_UN, hostal.alojamiento_tipo());
@@ -152,8 +153,7 @@ public class TurismoService {
                     verificarAlojamientoDocumentEIncrementarCuenta(viviendaTuristicaDocument,viviendasTuristicas,cuenta,viviendaTuristicaMongoRepository);
                 }
             }
-        }
-
+        });
         apartamentoRuralMongoRepository.saveAll(toApartamentoRuralDocumentList(apartamentosRurales));
         LOGGER.log(Level.INFO, "Guardados en DB {} apartamentos rurales.", apartamentosRurales.size());
         apartTuristicoMongoRepository.saveAll(toApartTuristicoDocumentList(apartTuristicos));
