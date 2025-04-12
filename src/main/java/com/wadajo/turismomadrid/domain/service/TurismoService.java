@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.wadajo.turismomadrid.infrastructure.configuration.Constants.RECONOCIDO_UN;
@@ -89,8 +90,10 @@ public class TurismoService {
         List<AlojamientoDocument> pensiones = new ArrayList<>();
         List<AlojamientoDocument> viviendasTuristicas = new ArrayList<>();
 
-        todosLosAlojamientos.parallelStream()
-                .forEach(alojamientoTuristico -> {
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            todosLosAlojamientos.parallelStream()
+                .forEach(alojamientoTuristico ->
+                executor.submit(() -> {
                     switch (alojamientoTuristico) {
                         case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
                             var apartamentoRuralDocument=conversionService.convert(apartamentoRural, ApartamentoRuralDocument.class);
@@ -117,43 +120,47 @@ public class TurismoService {
                             LOGGER.log(DEBUG, RECONOCIDO_UN, casaRural.alojamiento_tipo());
                             verificarAlojamientoDocumentEIncrementarCuenta(casaRuralDocument,casasRurales,cuenta,casaRuralMongoRepository);
                         }
-                case AlojamientoTuristico.Hostal hostal -> {
-                    var hostalDocument=conversionService.convert(hostal, HostalDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, hostal.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(hostalDocument,hostales,cuenta,hostalMongoRepository);
-                }
-                case AlojamientoTuristico.Hosteria hosteria -> {
-                    var hosteriaDocument=conversionService.convert(hosteria, HosteriaDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, hosteria.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(hosteriaDocument,hosterias,cuenta,hosteriaMongoRepository);
-                }
-                case AlojamientoTuristico.Hotel hotel -> {
-                    var hotelDocument=conversionService.convert(hotel, HotelDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, hotel.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(hotelDocument,hoteles,cuenta,hotelMongoRepository);
-                }
-                case AlojamientoTuristico.HotelApart hotelApart -> {
-                    var hotelApartDocument=conversionService.convert(hotelApart, HotelApartDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, hotelApart.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(hotelApartDocument,hotelesApart,cuenta,hotelApartMongoRepository);
-                }
-                case AlojamientoTuristico.HotelRural hotelRural -> {
-                    var hotelRuralDocument=conversionService.convert(hotelRural, HotelRuralDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, hotelRural.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(hotelRuralDocument,hotelesRurales,cuenta,hotelRuralMongoRepository);
-                }
-                case AlojamientoTuristico.Pension pension -> {
-                    var pensionDocument=conversionService.convert(pension, PensionDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, pension.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(pensionDocument,pensiones,cuenta,pensionMongoRepository);
-                }
-                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
-                    var viviendaTuristicaDocument=conversionService.convert(viviendaTuristica, ViviendaTuristicaDocument.class);
-                    LOGGER.log(DEBUG, RECONOCIDO_UN, viviendaTuristica.alojamiento_tipo());
-                    verificarAlojamientoDocumentEIncrementarCuenta(viviendaTuristicaDocument,viviendasTuristicas,cuenta,viviendaTuristicaMongoRepository);
-                }
-            }
-        });
+                        case AlojamientoTuristico.Hostal hostal -> {
+                            var hostalDocument=conversionService.convert(hostal, HostalDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hostal.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hostalDocument,hostales,cuenta,hostalMongoRepository);
+                        }
+                        case AlojamientoTuristico.Hosteria hosteria -> {
+                            var hosteriaDocument=conversionService.convert(hosteria, HosteriaDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hosteria.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hosteriaDocument,hosterias,cuenta,hosteriaMongoRepository);
+                        }
+                        case AlojamientoTuristico.Hotel hotel -> {
+                            var hotelDocument=conversionService.convert(hotel, HotelDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotel.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelDocument,hoteles,cuenta,hotelMongoRepository);
+                        }
+                        case AlojamientoTuristico.HotelApart hotelApart -> {
+                            var hotelApartDocument=conversionService.convert(hotelApart, HotelApartDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelApart.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelApartDocument,hotelesApart,cuenta,hotelApartMongoRepository);
+                        }
+                        case AlojamientoTuristico.HotelRural hotelRural -> {
+                            var hotelRuralDocument=conversionService.convert(hotelRural, HotelRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelRural.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelRuralDocument,hotelesRurales,cuenta,hotelRuralMongoRepository);
+                        }
+                        case AlojamientoTuristico.Pension pension -> {
+                            var pensionDocument=conversionService.convert(pension, PensionDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, pension.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(pensionDocument,pensiones,cuenta,pensionMongoRepository);
+                        }
+                        case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
+                            var viviendaTuristicaDocument=conversionService.convert(viviendaTuristica, ViviendaTuristicaDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, viviendaTuristica.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(viviendaTuristicaDocument,viviendasTuristicas,cuenta,viviendaTuristicaMongoRepository);
+                        }
+                    }
+                }));
+        } catch (Exception e) {
+            LOGGER.error("Error al procesar alojamientos turísticos", e);
+        }
+
         apartamentoRuralMongoRepository.saveAll(toApartamentoRuralDocumentList(apartamentosRurales));
         LOGGER.log(Level.INFO, "Guardados en DB {} apartamentos rurales.", apartamentosRurales.size());
         apartTuristicoMongoRepository.saveAll(toApartTuristicoDocumentList(apartTuristicos));
@@ -343,58 +350,62 @@ public class TurismoService {
         AtomicLong pensiones = new AtomicLong();
         AtomicLong viviendasTuristicas = new AtomicLong();
 
-        for (AlojamientoTuristico unAlojamiento : listaFinal){
-            switch (unAlojamiento){
-                case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
-                    apartamentosRurales.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, apartamentoRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.ApartTuristico apartTuristico -> {
-                    apartTuristicos.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, apartTuristico.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Camping camping -> {
-                    campings.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, camping.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
-                    casasHuespedes.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, casaHuespedes.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.CasaRural casaRural -> {
-                    casasRurales.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, casaRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hostal hostal -> {
-                    hostales.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hostal.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hosteria hosteria -> {
-                    hosterias.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hosteria.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Hotel hotel -> {
-                    hoteles.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotel.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.HotelApart hotelApart -> {
-                    apartHoteles.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotelApart.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.HotelRural hotelRural -> {
-                    hotelesRurales.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotelRural.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.Pension pension -> {
-                    pensiones.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, pension.alojamiento_tipo());
-                }
-                case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
-                    viviendasTuristicas.incrementAndGet();
-                    LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, viviendaTuristica.alojamiento_tipo());
-                }
-            }
-        }
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            listaFinal.parallelStream()
+                .forEach(unAlojamiento ->
+                    executor.submit(() -> {
+                        switch (unAlojamiento){
+                            case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
+                                apartamentosRurales.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, apartamentoRural.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.ApartTuristico apartTuristico -> {
+                                apartTuristicos.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, apartTuristico.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.Camping camping -> {
+                                campings.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, camping.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
+                                casasHuespedes.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, casaHuespedes.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.CasaRural casaRural -> {
+                                casasRurales.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, casaRural.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.Hostal hostal -> {
+                                hostales.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hostal.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.Hosteria hosteria -> {
+                                hosterias.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hosteria.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.Hotel hotel -> {
+                                hoteles.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotel.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.HotelApart hotelApart -> {
+                                apartHoteles.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotelApart.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.HotelRural hotelRural -> {
+                                hotelesRurales.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, hotelRural.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.Pension pension -> {
+                                pensiones.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, pension.alojamiento_tipo());
+                            }
+                            case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
+                                viviendasTuristicas.incrementAndGet();
+                                LOGGER.log(Level.DEBUG, Constants.CONTADO_UN, viviendaTuristica.alojamiento_tipo());
+                            }
+                        }
+                    }
+                ));
             mapa.put(TipoAlojamiento.APARTAMENTO_RURAL.toString(),apartamentosRurales);
             mapa.put(TipoAlojamiento.APART_TURISTICO.toString(),apartTuristicos);
             mapa.put(TipoAlojamiento.CAMPING.toString(),campings);
@@ -407,9 +418,12 @@ public class TurismoService {
             mapa.put(TipoAlojamiento.HOTEL_RURAL.toString(),hotelesRurales);
             mapa.put(TipoAlojamiento.PENSION.toString(),pensiones);
             mapa.put(TipoAlojamiento.VIVIENDAS_TURISTICAS.toString(),viviendasTuristicas);
-
+        } catch (Exception e) {
+            LOGGER.error("Error al generar mapa con la cuenta. ", e);
+        } finally {
             String message = String.format("Resultado: Total alojamientos turisticos: %d. %s", listaFinal.size(), mapa);
             LOGGER.log(Level.INFO, message);
+        }
     }
 
 }
