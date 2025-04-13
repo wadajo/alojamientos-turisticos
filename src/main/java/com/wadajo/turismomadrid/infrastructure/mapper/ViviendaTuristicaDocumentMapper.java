@@ -16,6 +16,8 @@ public interface ViviendaTuristicaDocumentMapper extends Converter<AlojamientoTu
     @Mapping(target = "bloque", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "planta", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "puerta", qualifiedBy = EmptyStringToNull.class)
+    @Mapping(target = "signatura", qualifiedBy = EmptyStringToNull.class)
+    @Mapping(target = "categoria", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "escalera", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "codpostal", source = "cdpostal", qualifiedBy = EmptyStringToNull.class)
     @Mapping(target = "denominacion", qualifiedBy = EmptyStringToNull.class)

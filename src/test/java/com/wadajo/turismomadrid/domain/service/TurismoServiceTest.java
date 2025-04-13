@@ -86,7 +86,7 @@ class TurismoServiceTest {
             .thenAnswer(invocation -> {
                 AlojamientoTuristicoRaw raw = invocation.getArgument(0);
                 return new AlojamientoTuristico.Hotel(
-                    raw.via_tipo(), raw.via_nombre(), raw.numero(), raw.portal(), raw.bloque(), raw.planta(), raw.puerta(), raw.escalera(), raw.denominacion(), raw.cdpostal(), raw.localidad(), TipoAlojamiento.valueOf(raw.alojamiento_tipo()));
+                    raw.via_tipo(), raw.via_nombre(), raw.numero(), raw.portal(), raw.bloque(), raw.planta(), raw.puerta(), raw.signatura(), raw.categoria(), raw.escalera(), raw.denominacion(), raw.cdpostal(), raw.localidad(), TipoAlojamiento.valueOf(raw.alojamiento_tipo()));
             });
         when(conversionService.convert(Mockito.any(AlojamientoTuristico.Hotel.class), eq(HotelDocument.class)))
             .thenReturn(new HotelDocument());
@@ -145,8 +145,8 @@ class TurismoServiceTest {
     }
 
     private static List<AlojamientoTuristico> getAlojamientosTuristicos() {
-        AlojamientoTuristico.Hotel hotel1 = new AlojamientoTuristico.Hotel("CALLE","del Pez","2","","","","","","HOTEL DEL TEST","28012","Madrid",TipoAlojamiento.HOTEL);
-        AlojamientoTuristico.Hotel hotel2 = new AlojamientoTuristico.Hotel("CALLE","del Pez","5","","","","","","HOTEL DEL ENSAYO","28012","Madrid",TipoAlojamiento.HOTEL);
+        AlojamientoTuristico.Hotel hotel1 = new AlojamientoTuristico.Hotel("CALLE","del Pez","2","","","","","","","","HOTEL DEL TEST","28012","Madrid",TipoAlojamiento.HOTEL);
+        AlojamientoTuristico.Hotel hotel2 = new AlojamientoTuristico.Hotel("CALLE","del Pez","5","","","","","","","","HOTEL DEL ENSAYO","28012","Madrid",TipoAlojamiento.HOTEL);
         List<AlojamientoTuristico> alojamientosTuristicos = new ArrayList<>();
         alojamientosTuristicos.add(hotel1);
         alojamientosTuristicos.add(hotel2);

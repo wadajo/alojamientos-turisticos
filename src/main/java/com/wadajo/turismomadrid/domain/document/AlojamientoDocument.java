@@ -11,11 +11,11 @@ public abstract sealed class AlojamientoDocument permits ApartamentoRuralDocumen
     @Id
     public String id;
 
-    public String via_tipo, via_nombre, numero, portal, bloque, planta, puerta, escalera, denominacion, codpostal, localidad;
+    public String via_tipo, via_nombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, codpostal, localidad;
     public String alojamiento_tipo;
     public LocalDateTime timestamp;
 
-    public AlojamientoDocument(){
+    protected AlojamientoDocument(){
     }
 
 }
