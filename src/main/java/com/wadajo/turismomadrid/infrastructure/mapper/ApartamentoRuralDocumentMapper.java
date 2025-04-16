@@ -2,6 +2,7 @@ package com.wadajo.turismomadrid.infrastructure.mapper;
 
 import com.wadajo.turismomadrid.domain.document.ApartamentoRuralDocument;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
+import jakarta.annotation.Nonnull;
 import org.mapstruct.*;
 import org.springframework.core.convert.converter.Converter;
 
@@ -23,7 +24,7 @@ public interface ApartamentoRuralDocumentMapper extends Converter<AlojamientoTur
     @Mapping(target = "alojamiento_tipo", constant = "Apartamento rural")
     @Mapping(target = "timestamp", expression = "java(java.time.LocalDateTime.now())")
     @Override
-    ApartamentoRuralDocument convert(AlojamientoTuristico.ApartamentoRural apartamentoRural);
+    ApartamentoRuralDocument convert(@Nonnull AlojamientoTuristico.ApartamentoRural apartamentoRural);
 
     @EmptyStringToNull
     default String emptyStringToNull(String s) {

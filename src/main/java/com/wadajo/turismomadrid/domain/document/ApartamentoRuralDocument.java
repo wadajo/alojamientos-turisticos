@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public final class ApartamentoRuralDocument extends AlojamientoDocument {
 
     public ApartamentoRuralDocument(){
+        // Empty constructor for MongoDB
     }
 
 }
