@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wadajo.turismomadrid.TurismoAcceptanceBaseIT;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.system.CapturedOutput;
 
@@ -19,17 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 class TurismoAcceptanceTestsIT extends TurismoAcceptanceBaseIT {
-
-    @BeforeEach
-    void setUp() throws IOException {
-        JsonNode alojamientosRaw = new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_STUBBING_FILE));
-
-        stubFor(get("/")
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withJsonBody(alojamientosRaw)
-            ));
-    }
 
     @Test
     void debeDevolverTodosLosAlojamientosTuristicosAlPedirLaQuery(CapturedOutput output) throws IOException {
