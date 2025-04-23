@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -74,86 +75,86 @@ public class TurismoService {
     }
 
     public String actualizarAlojamientosEnDb(){
-        var todosLosAlojamientos = alojamientosService.getAlojamientosTotales();
+        List<AlojamientoTuristico> todosLosAlojamientosEnRemoto = alojamientosService.getAlojamientosTotales();
         AtomicLong cuenta = new AtomicLong();
 
-        List<AlojamientoDocument> apartamentosRurales = new ArrayList<>();
-        List<AlojamientoDocument> apartTuristicos = new ArrayList<>();
-        List<AlojamientoDocument> campings = new ArrayList<>();
-        List<AlojamientoDocument> casasHuespedes = new ArrayList<>();
-        List<AlojamientoDocument> casasRurales = new ArrayList<>();
-        List<AlojamientoDocument> hostales = new ArrayList<>();
-        List<AlojamientoDocument> hosterias = new ArrayList<>();
-        List<AlojamientoDocument> hoteles = new ArrayList<>();
-        List<AlojamientoDocument> hotelesApart = new ArrayList<>();
-        List<AlojamientoDocument> hotelesRurales = new ArrayList<>();
-        List<AlojamientoDocument> pensiones = new ArrayList<>();
-        List<AlojamientoDocument> viviendasTuristicas = new ArrayList<>();
+        List<AlojamientoDocument> apartamentosRuralesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> apartTuristicosDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> campingsDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> casasHuespedesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> casasRuralesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> hostalesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> hosteriasDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> hotelesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> hotelesApartDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> hotelesRuralesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> pensionesDocumentList = new ArrayList<>();
+        List<AlojamientoDocument> viviendasTuristicasDocumentList = new ArrayList<>();
 
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            todosLosAlojamientos.parallelStream()
-                .forEach(alojamientoTuristico ->
+            todosLosAlojamientosEnRemoto.parallelStream()
+                .forEach(alojamientoTuristicoEnRemoto ->
                 executor.submit(() -> {
-                    switch (alojamientoTuristico) {
-                        case AlojamientoTuristico.ApartamentoRural apartamentoRural -> {
-                            var apartamentoRuralDocument=conversionService.convert(apartamentoRural, ApartamentoRuralDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartamentoRural.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(apartamentoRuralDocument, apartamentosRurales, cuenta, apartamentoRuralMongoRepository);
+                    switch (alojamientoTuristicoEnRemoto) {
+                        case AlojamientoTuristico.ApartamentoRural apartamentoRuralRemoto -> {
+                            var apartamentoRuralDocument=conversionService.convert(apartamentoRuralRemoto, ApartamentoRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartamentoRuralRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(apartamentoRuralDocument, apartamentosRuralesDocumentList, cuenta, apartamentoRuralMongoRepository);
                         }
-                        case AlojamientoTuristico.ApartTuristico apartTuristico -> {
-                            var apartTuristicoDocument=conversionService.convert(apartTuristico, ApartTuristicoDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartTuristico.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(apartTuristicoDocument, apartTuristicos, cuenta, apartTuristicoMongoRepository);
+                        case AlojamientoTuristico.ApartTuristico apartTuristicoRemoto -> {
+                            var apartTuristicoDocument=conversionService.convert(apartTuristicoRemoto, ApartTuristicoDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, apartTuristicoRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(apartTuristicoDocument, apartTuristicosDocumentList, cuenta, apartTuristicoMongoRepository);
                         }
-                        case AlojamientoTuristico.Camping camping -> {
-                            var campingDocument=conversionService.convert(camping, CampingDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, camping.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(campingDocument,campings,cuenta,campingMongoRepository);
+                        case AlojamientoTuristico.Camping campingRemoto -> {
+                            var campingDocument=conversionService.convert(campingRemoto, CampingDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, campingRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(campingDocument,campingsDocumentList,cuenta,campingMongoRepository);
                         }
-                        case AlojamientoTuristico.CasaHuespedes casaHuespedes -> {
-                            var casaHuespedesDocument=conversionService.convert(casaHuespedes, CasaHuespedesDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaHuespedes.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(casaHuespedesDocument,casasHuespedes,cuenta,casaHuespedesMongoRepository);
+                        case AlojamientoTuristico.CasaHuespedes casaHuespedesRemoto -> {
+                            var casaHuespedesDocument=conversionService.convert(casaHuespedesRemoto, CasaHuespedesDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaHuespedesRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(casaHuespedesDocument,casasHuespedesDocumentList,cuenta,casaHuespedesMongoRepository);
                         }
-                        case AlojamientoTuristico.CasaRural casaRural -> {
-                            var casaRuralDocument=conversionService.convert(casaRural, CasaRuralDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaRural.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(casaRuralDocument,casasRurales,cuenta,casaRuralMongoRepository);
+                        case AlojamientoTuristico.CasaRural casaRuralRemoto -> {
+                            var casaRuralDocument=conversionService.convert(casaRuralRemoto, CasaRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, casaRuralRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(casaRuralDocument,casasRuralesDocumentList,cuenta,casaRuralMongoRepository);
                         }
-                        case AlojamientoTuristico.Hostal hostal -> {
-                            var hostalDocument=conversionService.convert(hostal, HostalDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, hostal.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(hostalDocument,hostales,cuenta,hostalMongoRepository);
+                        case AlojamientoTuristico.Hostal hostalRemoto -> {
+                            var hostalDocument=conversionService.convert(hostalRemoto, HostalDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hostalRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hostalDocument,hostalesDocumentList,cuenta,hostalMongoRepository);
                         }
-                        case AlojamientoTuristico.Hosteria hosteria -> {
-                            var hosteriaDocument=conversionService.convert(hosteria, HosteriaDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, hosteria.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(hosteriaDocument,hosterias,cuenta,hosteriaMongoRepository);
+                        case AlojamientoTuristico.Hosteria hosteriaRemoto -> {
+                            var hosteriaDocument=conversionService.convert(hosteriaRemoto, HosteriaDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hosteriaRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hosteriaDocument,hosteriasDocumentList,cuenta,hosteriaMongoRepository);
                         }
-                        case AlojamientoTuristico.Hotel hotel -> {
-                            var hotelDocument=conversionService.convert(hotel, HotelDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotel.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(hotelDocument,hoteles,cuenta,hotelMongoRepository);
+                        case AlojamientoTuristico.Hotel hotelRemoto -> {
+                            var hotelDocument=conversionService.convert(hotelRemoto, HotelDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelDocument,hotelesDocumentList,cuenta,hotelMongoRepository);
                         }
-                        case AlojamientoTuristico.HotelApart hotelApart -> {
-                            var hotelApartDocument=conversionService.convert(hotelApart, HotelApartDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelApart.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(hotelApartDocument,hotelesApart,cuenta,hotelApartMongoRepository);
+                        case AlojamientoTuristico.HotelApart hotelApartRemoto -> {
+                            var hotelApartDocument=conversionService.convert(hotelApartRemoto, HotelApartDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelApartRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelApartDocument,hotelesApartDocumentList,cuenta,hotelApartMongoRepository);
                         }
-                        case AlojamientoTuristico.HotelRural hotelRural -> {
-                            var hotelRuralDocument=conversionService.convert(hotelRural, HotelRuralDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelRural.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(hotelRuralDocument,hotelesRurales,cuenta,hotelRuralMongoRepository);
+                        case AlojamientoTuristico.HotelRural hotelRuralRemoto -> {
+                            var hotelRuralDocument=conversionService.convert(hotelRuralRemoto, HotelRuralDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, hotelRuralRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(hotelRuralDocument,hotelesRuralesDocumentList,cuenta,hotelRuralMongoRepository);
                         }
-                        case AlojamientoTuristico.Pension pension -> {
-                            var pensionDocument=conversionService.convert(pension, PensionDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, pension.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(pensionDocument,pensiones,cuenta,pensionMongoRepository);
+                        case AlojamientoTuristico.Pension pensionRemoto -> {
+                            var pensionDocument=conversionService.convert(pensionRemoto, PensionDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, pensionRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(pensionDocument,pensionesDocumentList,cuenta,pensionMongoRepository);
                         }
-                        case AlojamientoTuristico.ViviendaTuristica viviendaTuristica -> {
-                            var viviendaTuristicaDocument=conversionService.convert(viviendaTuristica, ViviendaTuristicaDocument.class);
-                            LOGGER.log(DEBUG, RECONOCIDO_UN, viviendaTuristica.alojamiento_tipo());
-                            verificarAlojamientoDocumentEIncrementarCuenta(viviendaTuristicaDocument,viviendasTuristicas,cuenta,viviendaTuristicaMongoRepository);
+                        case AlojamientoTuristico.ViviendaTuristica viviendaTuristicaRemoto -> {
+                            var viviendaTuristicaDocument=conversionService.convert(viviendaTuristicaRemoto, ViviendaTuristicaDocument.class);
+                            LOGGER.log(DEBUG, RECONOCIDO_UN, viviendaTuristicaRemoto.alojamiento_tipo());
+                            verificarAlojamientoDocumentEIncrementarCuenta(viviendaTuristicaDocument,viviendasTuristicasDocumentList,cuenta,viviendaTuristicaMongoRepository);
                         }
                     }
                 }));
@@ -161,33 +162,308 @@ public class TurismoService {
             LOGGER.error("Error al procesar alojamientos turísticos", e);
         }
 
-        apartamentoRuralMongoRepository.saveAll(toApartamentoRuralDocumentList(apartamentosRurales));
-        LOGGER.log(Level.INFO, "Guardados en DB {} apartamentos rurales.", apartamentosRurales.size());
-        apartTuristicoMongoRepository.saveAll(toApartTuristicoDocumentList(apartTuristicos));
-        LOGGER.log(Level.INFO, "Guardados en DB {} apart turísticos.", apartTuristicos.size());
-        campingMongoRepository.saveAll(toCampingDocumentList(campings));
-        LOGGER.log(Level.INFO, "Guardados en DB {} campings.", campings.size());
-        casaHuespedesMongoRepository.saveAll(toCasaHuespedesDocumentList(casasHuespedes));
-        LOGGER.log(Level.INFO, "Guardados en DB {} casas huéspedes.", casasHuespedes.size());
-        casaRuralMongoRepository.saveAll(toCasaRuralDocumentList(casasRurales));
-        LOGGER.log(Level.INFO, "Guardados en DB {} casas rurales.", casasRurales.size());
-        hostalMongoRepository.saveAll(toHostalDocumentList(hostales));
-        LOGGER.log(Level.INFO, "Guardados en DB {} hostales.", hostales.size());
-        hosteriaMongoRepository.saveAll(toHosteriaDocumentList(hosterias));
-        LOGGER.log(Level.INFO, "Guardados en DB {} hosterías.", hosterias.size());
-        hotelApartMongoRepository.saveAll(toHotelApartDocumentList(hotelesApart));
-        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles apart.", hotelesApart.size());
-        hotelMongoRepository.saveAll(toHotelDocumentList(hoteles));
-        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles.", hoteles.size());
-        hotelRuralMongoRepository.saveAll(toHotelRuralDocumentList(hotelesRurales));
-        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles rurales.", hotelesRurales.size());
-        pensionMongoRepository.saveAll(toPensionDocumentList(pensiones));
-        LOGGER.log(Level.INFO, "Guardados en DB {} pensiones.", pensiones.size());
-        viviendaTuristicaMongoRepository.saveAll(toViviendaTuristicaDocumentList(viviendasTuristicas));
-        LOGGER.log(Level.INFO, "Guardados en DB {} viviendas turísticas.", viviendasTuristicas.size());
+        var apartamentoRuralResult=apartamentoRuralMongoRepository.saveAll(toApartamentoRuralDocumentList(apartamentosRuralesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} apartamentos rurales.", apartamentoRuralResult.size());
+        var apartTuristicoResult=apartTuristicoMongoRepository.saveAll(toApartTuristicoDocumentList(apartTuristicosDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} apart turísticos.", apartTuristicoResult.size());
+        var campingResult=campingMongoRepository.saveAll(toCampingDocumentList(campingsDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} campings.", campingResult.size());
+        var casaHuespedesResult=casaHuespedesMongoRepository.saveAll(toCasaHuespedesDocumentList(casasHuespedesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} casas huéspedes.", casaHuespedesResult.size());
+        var casaRuralResult=casaRuralMongoRepository.saveAll(toCasaRuralDocumentList(casasRuralesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} casas rurales.", casaRuralResult.size());
+        var hostalResult=hostalMongoRepository.saveAll(toHostalDocumentList(hostalesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} hostales.", hostalResult.size());
+        var hosteriaResult=hosteriaMongoRepository.saveAll(toHosteriaDocumentList(hosteriasDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} hosterías.", hosteriaResult.size());
+        var hotelApartResult=hotelApartMongoRepository.saveAll(toHotelApartDocumentList(hotelesApartDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles apart.", hotelApartResult.size());
+        var hotelResult=hotelMongoRepository.saveAll(toHotelDocumentList(hotelesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles.", hotelResult.size());
+        var hotelRuralResult=hotelRuralMongoRepository.saveAll(toHotelRuralDocumentList(hotelesRuralesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} hoteles rurales.", hotelRuralResult.size());
+        var pensionResult=pensionMongoRepository.saveAll(toPensionDocumentList(pensionesDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} pensiones.", pensionResult.size());
+        var viviendaTuristicaResult=viviendaTuristicaMongoRepository.saveAll(toViviendaTuristicaDocumentList(viviendasTuristicasDocumentList));
+        LOGGER.log(Level.INFO, "Guardados en DB {} viviendas turísticas.", viviendaTuristicaResult.size());
 
-        generarMapaConLaCuenta(todosLosAlojamientos);
+        eliminarAlojamientosTuristicosObsoletos(apartamentoRuralMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(apartTuristicoMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(campingMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(casaHuespedesMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(casaRuralMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(hostalMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(hosteriaMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(hotelApartMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(hotelMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(hotelRuralMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(pensionMongoRepository,todosLosAlojamientosEnRemoto);
+        eliminarAlojamientosTuristicosObsoletos(viviendaTuristicaMongoRepository,todosLosAlojamientosEnRemoto);
+
+        generarMapaConLaCuenta(todosLosAlojamientosEnRemoto);
         return "Han sido actualizados en DB: "+ cuenta+" alojamientos.";
+    }
+
+    private <S extends AlojamientoDocument> void eliminarAlojamientosTuristicosObsoletos(
+                                                      MongoRepository<S, String> repository,
+                                                      List<AlojamientoTuristico> alojamientosTuristicosRemoto) {
+        List<? extends AlojamientoDocument> alojamientosTuristicosEnBbDd=repository.findAll();
+        var alojamientosTuristicosObsoletos=
+            alojamientosTuristicosEnBbDd.stream()
+                .filter(alojamientoEnBbDd -> alojamientosTuristicosRemoto.stream()
+                    .noneMatch(alojamientoRemoto -> sonEquivalentes(alojamientoEnBbDd, alojamientoRemoto)))
+                .toList();
+        if (alojamientosTuristicosObsoletos.isEmpty()) {
+            LOGGER.info("No se han encontrado alojamientos obsoletos del tipo: {}", alojamientosTuristicosEnBbDd.getFirst().alojamiento_tipo);
+        } else {
+            LOGGER.info("Encontrado alojamiento obsoleto del tipo: {} ",alojamientosTuristicosObsoletos.getFirst().denominacion);
+            LOGGER.info("Encontrados {} alojamientos obsoletos del tipo: {} ",alojamientosTuristicosObsoletos.size(),alojamientosTuristicosEnBbDd.getFirst().alojamiento_tipo);
+            repository.deleteAll((Iterable<? extends S>) alojamientosTuristicosObsoletos);
+        }
+    }
+
+    private static <S extends AlojamientoTuristico> boolean sonEquivalentes(AlojamientoDocument alojamientoDocument, S alojamientoTuristicoRemoto) {
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ApartamentoRural(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNull(alojamientoDocument.portal).equals(portal) &&
+                Objects.requireNonNull(alojamientoDocument.bloque).equals(bloque) &&
+                Objects.requireNonNull(alojamientoDocument.planta).equals(planta) &&
+                Objects.requireNonNull(alojamientoDocument.puerta).equals(puerta) &&
+                Objects.requireNonNull(alojamientoDocument.signatura).equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNull(alojamientoDocument.escalera).equals(escalera) &&
+                Objects.requireNonNull(alojamientoDocument.denominacion).equals(denominacion) &&
+                Objects.requireNonNull(alojamientoDocument.codpostal).equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ApartTuristico(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Camping(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaHuespedes(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaRural(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hostal(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hosteria(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelApart(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hotel(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelRural(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Pension(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ViviendaTuristica(
+            String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
+            String signatura, String categoria, String escalera, String denominacion, String cdpostal, String localidad,
+            TipoAlojamiento alojamientoTipo
+        )) {
+            return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
+                Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
+                alojamientoDocument.numero.equals(numero) &&
+                alojamientoDocument.portal.equals(portal) &&
+                alojamientoDocument.bloque.equals(bloque) &&
+                alojamientoDocument.planta.equals(planta) &&
+                alojamientoDocument.puerta.equals(puerta) &&
+                alojamientoDocument.signatura.equals(signatura) &&
+                alojamientoDocument.categoria.equals(categoria) &&
+                alojamientoDocument.escalera.equals(escalera) &&
+                alojamientoDocument.denominacion.equals(denominacion) &&
+                alojamientoDocument.codpostal.equals(cdpostal) &&
+                alojamientoDocument.localidad.equals(localidad) &&
+                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+        }
+        return false;
     }
 
     public void borrarTodo() {
@@ -326,11 +602,11 @@ public class TurismoService {
     }
 
     private <S extends AlojamientoDocument> void verificarAlojamientoDocumentEIncrementarCuenta(S alojamientoDocument,
-                                                                List<? super AlojamientoDocument> alojamientoDocumentArrayList,
+                                                                List<? super AlojamientoDocument> alojamientoDocumentList,
                                                                 AtomicLong cuenta,
                                                                 MongoRepository<S, String> repository) {
         if(!repository.exists(Example.of(alojamientoDocument,alojamientoMatcher))) {
-            alojamientoDocumentArrayList.addLast(alojamientoDocument);
+            alojamientoDocumentList.addLast(alojamientoDocument);
             cuenta.incrementAndGet();
         }
     }

@@ -4,6 +4,7 @@ import com.wadajo.turismomadrid.application.client.AlojamientosClient;
 import com.wadajo.turismomadrid.application.exception.ResponseTypeDtoException;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.HotelDocument;
+import com.wadajo.turismomadrid.domain.document.ViviendaTuristicaDocument;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientoTuristicoRaw;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.enums.TipoAlojamiento;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +95,9 @@ class TurismoServiceTest {
 
         when(alojamientosService.getAlojamientosTotales())
             .thenReturn(getAlojamientosTuristicos());
+
+        when(viviendaTuristicaMongoRepository.saveAll(anyList()))
+            .thenReturn(List.of(new ViviendaTuristicaDocument()));
     }
 
     @Test
@@ -142,6 +147,14 @@ class TurismoServiceTest {
         assertThat(output)
             .contains(TestConstants.RESULTADO_OUTPUT_MOCKS)
             .contains("Guardados en DB 2 hoteles.");
+    }
+
+    @Test
+    void debeBorrarLosAlojamientosObsoletosEnCasoDeHaberlosEnBbDd(CapturedOutput output) {
+        var result = turismoService.actualizarAlojamientosEnDb();
+
+        assertThat(result).isEqualTo("Borrados");
+        assertThat(output).contains("Borrados 2 alojamientos obsoletos.");
     }
 
     private static List<AlojamientoTuristico> getAlojamientosTuristicos() {
