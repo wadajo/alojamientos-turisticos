@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.io.File;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RestClientTest(AlojamientosClient.class)
 @OverrideAutoConfiguration(enabled = true)
+@ActiveProfiles("test")
 class AlojamientosClientTest {
 
     @Autowired

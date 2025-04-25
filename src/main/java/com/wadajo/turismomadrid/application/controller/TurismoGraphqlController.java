@@ -28,12 +28,14 @@ public class TurismoGraphqlController {
         if (tipo.isPresent()) {
             return service.getAlojamientosByType(tipo.value());
         } else {
-            return service.getAlojamientosTuristicos();
+            return service.getAlojamientosTuristicosEnRemoto();
         }
     }
     @MutationMapping
     String actualizarDB(){
-        return service.actualizarAlojamientosEnDb();
+        var resultGuardar=service.guardarTodosLosAlojamientosRemotosEnDb();
+        var resultEliminar=service.eliminarTodosLosAlojamientosObsoletosDeBbDd();
+        return String.format("%s %s", resultGuardar, resultEliminar);
     }
 
     @MutationMapping

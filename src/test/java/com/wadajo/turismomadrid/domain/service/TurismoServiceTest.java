@@ -27,8 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(OutputCaptureExtension.class)
 class TurismoServiceTest {
@@ -94,10 +93,8 @@ class TurismoServiceTest {
             .thenReturn(new HotelDocument());
 
         when(alojamientosService.getAlojamientosTotales())
-            .thenReturn(getAlojamientosTuristicos());
+            .thenReturn(getAlojamientosTuristicosEnRemoto());
 
-        when(viviendaTuristicaMongoRepository.saveAll(anyList()))
-            .thenReturn(List.of(new ViviendaTuristicaDocument()));
     }
 
     @Test
@@ -122,7 +119,7 @@ class TurismoServiceTest {
 
     @Test
     void debeObtenerLosAlojamientosTuristicos(CapturedOutput output) throws ResponseTypeDtoException {
-        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
+        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicosEnRemoto();
 
         assertThat(result).size().isEqualTo(2);
         assertThat(output).contains(TestConstants.RESULTADO_OUTPUT_MOCKS);
@@ -133,17 +130,20 @@ class TurismoServiceTest {
         when(alojamientosService.getAlojamientosTotales())
             .thenReturn(Collections.emptyList());
 
-        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicos();
+        List<AlojamientoTuristico> result = turismoService.getAlojamientosTuristicosEnRemoto();
 
         assertThat(result).isEmpty();
         assertThat(output.getOut()).contains("Resultado: Total alojamientos turisticos: 0");
     }
 
     @Test
-    void debeActualizarAlojamientoEnDbEInformarElResultado(CapturedOutput output) {
-        var result = turismoService.actualizarAlojamientosEnDb();
+    void debeGuardarAlojamientoEnDbEInformarElResultado(CapturedOutput output) {
+        when(hotelMongoRepository.saveAll(anyList()))
+            .thenReturn(List.of(new HotelDocument(), new HotelDocument()));
 
-        assertThat(result).isEqualTo("Han sido actualizados en DB: 2 alojamientos.");
+        var result = turismoService.guardarTodosLosAlojamientosRemotosEnDb();
+
+        assertThat(result).isEqualTo("Han sido guardados en DB: 2 alojamientos.");
         assertThat(output)
             .contains(TestConstants.RESULTADO_OUTPUT_MOCKS)
             .contains("Guardados en DB 2 hoteles.");
@@ -151,13 +151,62 @@ class TurismoServiceTest {
 
     @Test
     void debeBorrarLosAlojamientosObsoletosEnCasoDeHaberlosEnBbDd(CapturedOutput output) {
-        var result = turismoService.actualizarAlojamientosEnDb();
+        var hotelDocument1= new HotelDocument();
+        setHotelDocumentValues(hotelDocument1, "2", "HOTEL DEL TEST");
+        var hotelDocument2= new HotelDocument();
+        setHotelDocumentValues(hotelDocument2, "5", "HOTEL DEL ENSAYO");
+        var viviendaTuristicaDocument= new ViviendaTuristicaDocument();
+        setViviendaTuristicaDocumentValues(viviendaTuristicaDocument);
 
-        assertThat(result).isEqualTo("Borrados");
-        assertThat(output).contains("Borrados 2 alojamientos obsoletos.");
+        when(viviendaTuristicaMongoRepository.count())
+            .thenReturn(1L);
+        when(hotelMongoRepository.count())
+            .thenReturn(2L);
+        when(viviendaTuristicaMongoRepository.findAll())
+            .thenReturn(Collections.singletonList(viviendaTuristicaDocument));
+        when(hotelMongoRepository.findAll())
+            .thenReturn(List.of(hotelDocument1, hotelDocument2));
+        var result = turismoService.eliminarTodosLosAlojamientosObsoletosDeBbDd();
+
+        verify(viviendaTuristicaMongoRepository).deleteAll(anyIterable());
+        verify(hotelMongoRepository,never()).deleteAll(anyIterable());
+        assertThat(result).isEqualTo("Han sido eliminados alojamientos.");
+        assertThat(output).contains("Encontrados 1 alojamientos obsoletos del tipo: VIVIENDAS DE USO TU ");
     }
 
-    private static List<AlojamientoTuristico> getAlojamientosTuristicos() {
+    private static void setViviendaTuristicaDocumentValues(ViviendaTuristicaDocument viviendaTuristicaDocument) {
+        viviendaTuristicaDocument.via_tipo = ("CALLE");
+        viviendaTuristicaDocument.via_nombre = ("Dalias");
+        viviendaTuristicaDocument.numero = ("11");
+        viviendaTuristicaDocument.portal = ("");
+        viviendaTuristicaDocument.bloque = ("");
+        viviendaTuristicaDocument.planta = ("");
+        viviendaTuristicaDocument.puerta = ("");
+        viviendaTuristicaDocument.signatura = ("VT-1");
+        viviendaTuristicaDocument.denominacion = ("DALIAS, Nº 11");
+        viviendaTuristicaDocument.codpostal = ("28690");
+        viviendaTuristicaDocument.localidad = ("Brunete");
+        viviendaTuristicaDocument.alojamiento_tipo = ("VIVIENDAS DE USO TU ");
+    }
+
+    private static void setHotelDocumentValues(HotelDocument hotelDocument1, String numero, String denominacion) {
+        hotelDocument1.via_tipo = ("CALLE");
+        hotelDocument1.via_nombre = ("del Pez");
+        hotelDocument1.numero = numero;
+        hotelDocument1.portal = ("");
+        hotelDocument1.bloque = ("");
+        hotelDocument1.planta = ("");
+        hotelDocument1.puerta = ("");
+        hotelDocument1.signatura = ("");
+        hotelDocument1.categoria = ("");
+        hotelDocument1.escalera = ("");
+        hotelDocument1.denominacion = denominacion;
+        hotelDocument1.codpostal = ("28012");
+        hotelDocument1.localidad = ("Madrid");
+        hotelDocument1.alojamiento_tipo = "HOTEL";
+    }
+
+    private static List<AlojamientoTuristico> getAlojamientosTuristicosEnRemoto() {
         AlojamientoTuristico.Hotel hotel1 = new AlojamientoTuristico.Hotel("CALLE","del Pez","2","","","","","","","","HOTEL DEL TEST","28012","Madrid",TipoAlojamiento.HOTEL);
         AlojamientoTuristico.Hotel hotel2 = new AlojamientoTuristico.Hotel("CALLE","del Pez","5","","","","","","","","HOTEL DEL ENSAYO","28012","Madrid",TipoAlojamiento.HOTEL);
         List<AlojamientoTuristico> alojamientosTuristicos = new ArrayList<>();

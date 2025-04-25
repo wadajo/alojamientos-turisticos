@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.wadajo.turismomadrid.infrastructure.configuration.Constants.RECONOCIDO_UN;
 import static org.apache.logging.log4j.Level.DEBUG;
@@ -68,13 +70,13 @@ public class TurismoService {
         this.alojamientosService = alojamientosService;
     }
 
-    public List<AlojamientoTuristico> getAlojamientosTuristicos() throws ResponseTypeDtoException {
+    public List<AlojamientoTuristico> getAlojamientosTuristicosEnRemoto() throws ResponseTypeDtoException {
         var listaRaw = alojamientosService.getAlojamientosTotales();
         generarMapaConLaCuenta(listaRaw);
         return listaRaw;
     }
 
-    public String actualizarAlojamientosEnDb(){
+    public String guardarTodosLosAlojamientosRemotosEnDb(){
         List<AlojamientoTuristico> todosLosAlojamientosEnRemoto = alojamientosService.getAlojamientosTotales();
         AtomicLong cuenta = new AtomicLong();
 
@@ -187,21 +189,53 @@ public class TurismoService {
         var viviendaTuristicaResult=viviendaTuristicaMongoRepository.saveAll(toViviendaTuristicaDocumentList(viviendasTuristicasDocumentList));
         LOGGER.log(Level.INFO, "Guardados en DB {} viviendas turísticas.", viviendaTuristicaResult.size());
 
-        eliminarAlojamientosTuristicosObsoletos(apartamentoRuralMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(apartTuristicoMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(campingMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(casaHuespedesMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(casaRuralMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(hostalMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(hosteriaMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(hotelApartMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(hotelMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(hotelRuralMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(pensionMongoRepository,todosLosAlojamientosEnRemoto);
-        eliminarAlojamientosTuristicosObsoletos(viviendaTuristicaMongoRepository,todosLosAlojamientosEnRemoto);
-
         generarMapaConLaCuenta(todosLosAlojamientosEnRemoto);
-        return "Han sido actualizados en DB: "+ cuenta+" alojamientos.";
+        return "Han sido guardados en DB: "+ cuenta+" alojamientos.";
+    }
+
+    public String eliminarTodosLosAlojamientosObsoletosDeBbDd() {
+        var todosLosAlojamientosEnRemoto=alojamientosService.getAlojamientosTotales();
+        var cuentaTotalAlojamientosEnDb = getCuentaTotalAlojamientosEnDb();
+        if (cuentaTotalAlojamientosEnDb.get()>todosLosAlojamientosEnRemoto.size()) {
+            LOGGER.info("Se han encontrado alojamientos obsoletos en DB.");
+            eliminarAlojamientosTuristicosObsoletos(apartamentoRuralMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(apartTuristicoMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(campingMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(casaHuespedesMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(casaRuralMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(hostalMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(hosteriaMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(hotelApartMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(hotelMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(hotelRuralMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(pensionMongoRepository, todosLosAlojamientosEnRemoto);
+            eliminarAlojamientosTuristicosObsoletos(viviendaTuristicaMongoRepository, todosLosAlojamientosEnRemoto);
+            return "Han sido eliminados alojamientos.";
+        } else {
+            LOGGER.info("No se han encontrado alojamientos obsoletos en DB.");
+            return "No han sido eliminados alojamientos obsoletos.";
+        }
+    }
+
+    private AtomicLong getCuentaTotalAlojamientosEnDb() {
+        var cuentaTotalAlojamientosEnDb=new AtomicLong();
+        List<MongoRepository<? extends AlojamientoDocument, String>> repositories = List.of(
+            apartamentoRuralMongoRepository,
+            apartTuristicoMongoRepository,
+            campingMongoRepository,
+            casaHuespedesMongoRepository,
+            casaRuralMongoRepository,
+            hostalMongoRepository,
+            hosteriaMongoRepository,
+            hotelApartMongoRepository,
+            hotelMongoRepository,
+            hotelRuralMongoRepository,
+            pensionMongoRepository,
+            viviendaTuristicaMongoRepository
+        );
+        repositories.forEach(repo -> cuentaTotalAlojamientosEnDb.addAndGet(repo.count()));
+        LOGGER.info("Total alojamientos en DB: {}", cuentaTotalAlojamientosEnDb.get());
+        return cuentaTotalAlojamientosEnDb;
     }
 
     private <S extends AlojamientoDocument> void eliminarAlojamientosTuristicosObsoletos(
@@ -214,7 +248,15 @@ public class TurismoService {
                     .noneMatch(alojamientoRemoto -> sonEquivalentes(alojamientoEnBbDd, alojamientoRemoto)))
                 .toList();
         if (alojamientosTuristicosObsoletos.isEmpty()) {
-            LOGGER.info("No se han encontrado alojamientos obsoletos del tipo: {}", alojamientosTuristicosEnBbDd.getFirst().alojamiento_tipo);
+            String input=repository.getClass().toString();
+            Pattern pattern = Pattern.compile("\\.(\\w+?)MongoRepository");
+            Matcher matcher = pattern.matcher(input);
+            if (matcher.find()) {
+                String result = matcher.group(1);
+                LOGGER.info("No se han encontrado alojamientos obsoletos del tipo: {}", result);
+            } else {
+                LOGGER.info("No se han encontrado alojamientos obsoletos.");
+            }
         } else {
             LOGGER.info("Encontrado alojamiento obsoleto del tipo: {} ",alojamientosTuristicosObsoletos.getFirst().denominacion);
             LOGGER.info("Encontrados {} alojamientos obsoletos del tipo: {} ",alojamientosTuristicosObsoletos.size(),alojamientosTuristicosEnBbDd.getFirst().alojamiento_tipo);
@@ -231,17 +273,17 @@ public class TurismoService {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
                 Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
-                Objects.requireNonNull(alojamientoDocument.portal).equals(portal) &&
-                Objects.requireNonNull(alojamientoDocument.bloque).equals(bloque) &&
-                Objects.requireNonNull(alojamientoDocument.planta).equals(planta) &&
-                Objects.requireNonNull(alojamientoDocument.puerta).equals(puerta) &&
-                Objects.requireNonNull(alojamientoDocument.signatura).equals(signatura) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
                 Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
-                Objects.requireNonNull(alojamientoDocument.escalera).equals(escalera) &&
-                Objects.requireNonNull(alojamientoDocument.denominacion).equals(denominacion) &&
-                Objects.requireNonNull(alojamientoDocument.codpostal).equals(cdpostal) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
                 Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
-                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
+                Objects.requireNonNull(Objects.requireNonNull(alojamientoDocument.alojamiento_tipo)).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ApartTuristico(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -250,18 +292,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Camping(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -270,18 +312,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaHuespedes(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -290,18 +332,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaRural(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -310,18 +352,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hostal(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -330,18 +372,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hosteria(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -350,18 +392,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelApart(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -370,18 +412,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hotel(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -390,18 +432,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelRural(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -410,18 +452,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Pension(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -430,18 +472,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         if (alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ViviendaTuristica(
             String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta, String puerta,
@@ -450,18 +492,18 @@ public class TurismoService {
         )) {
             return Objects.requireNonNull(alojamientoDocument.via_tipo).equals(viaTipo) &&
                 Objects.requireNonNull(alojamientoDocument.via_nombre).equals(viaNombre) &&
-                alojamientoDocument.numero.equals(numero) &&
-                alojamientoDocument.portal.equals(portal) &&
-                alojamientoDocument.bloque.equals(bloque) &&
-                alojamientoDocument.planta.equals(planta) &&
-                alojamientoDocument.puerta.equals(puerta) &&
-                alojamientoDocument.signatura.equals(signatura) &&
-                alojamientoDocument.categoria.equals(categoria) &&
-                alojamientoDocument.escalera.equals(escalera) &&
-                alojamientoDocument.denominacion.equals(denominacion) &&
-                alojamientoDocument.codpostal.equals(cdpostal) &&
-                alojamientoDocument.localidad.equals(localidad) &&
-                alojamientoDocument.alojamiento_tipo.equals(alojamientoTipo.toString());
+                Objects.requireNonNull(alojamientoDocument.numero).equals(numero) &&
+                Objects.requireNonNullElse(alojamientoDocument.portal,"").equals(portal) &&
+                Objects.requireNonNullElse(alojamientoDocument.bloque,"").equals(bloque) &&
+                Objects.requireNonNullElse(alojamientoDocument.planta,"").equals(planta) &&
+                Objects.requireNonNullElse(alojamientoDocument.puerta,"").equals(puerta) &&
+                Objects.requireNonNullElse(alojamientoDocument.signatura,"").equals(signatura) &&
+                Objects.requireNonNull(alojamientoDocument.categoria).equals(categoria) &&
+                Objects.requireNonNullElse(alojamientoDocument.escalera,"").equals(escalera) &&
+                Objects.requireNonNullElse(alojamientoDocument.denominacion,"").equals(denominacion) &&
+                Objects.requireNonNullElse(alojamientoDocument.codpostal,"").equals(cdpostal) &&
+                Objects.requireNonNull(alojamientoDocument.localidad).equals(localidad) &&
+                Objects.requireNonNull(alojamientoDocument.alojamiento_tipo).equals(alojamientoTipo.toString());
         }
         return false;
     }
