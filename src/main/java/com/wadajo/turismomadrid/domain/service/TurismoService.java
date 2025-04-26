@@ -93,8 +93,8 @@ public class TurismoService {
         List<AlojamientoDocument> pensionesDocumentList = new ArrayList<>();
         List<AlojamientoDocument> viviendasTuristicasDocumentList = new ArrayList<>();
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            todosLosAlojamientosEnRemoto.parallelStream()
+        try (var executor = Executors.newSingleThreadExecutor()) {
+            todosLosAlojamientosEnRemoto
                 .forEach(alojamientoTuristicoEnRemoto ->
                 executor.submit(() -> {
                     switch (alojamientoTuristicoEnRemoto) {
@@ -668,8 +668,8 @@ public class TurismoService {
         AtomicLong pensiones = new AtomicLong();
         AtomicLong viviendasTuristicas = new AtomicLong();
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            listaFinal.parallelStream()
+        try (var executor = Executors.newSingleThreadExecutor()) {
+            listaFinal
                 .forEach(unAlojamiento ->
                     executor.submit(() -> {
                         switch (unAlojamiento){
