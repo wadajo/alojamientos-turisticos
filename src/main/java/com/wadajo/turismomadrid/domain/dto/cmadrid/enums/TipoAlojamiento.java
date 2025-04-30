@@ -15,7 +15,7 @@ public enum TipoAlojamiento {
     VIVIENDAS_TURISTICAS("VIVIENDAS DE USO TU ","Vivienda de uso turístico (Airbnb o sim)");
 
     private final String literalValueRaw;
-    private final String printValue;
+    public final String printValue;
 
     TipoAlojamiento(String literalValueRaw, String printValue) {
         this.literalValueRaw = literalValueRaw;
