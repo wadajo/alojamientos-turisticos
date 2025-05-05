@@ -171,7 +171,7 @@ class TurismoServiceTest {
 
         verify(viviendaTuristicaMongoRepository).deleteAll(anyIterable());
         verify(hotelMongoRepository,never()).deleteAll(anyIterable());
-        assertThat(result).isEqualTo("Han sido eliminados alojamientos.");
+        assertThat(result).isEqualTo("Han sido eliminados alojamientos obsoletos.");
         assertThat(output).contains(List.of(
             "Encontrados 1 alojamiento(s) obsoleto(s) del tipo: VIVIENDAS DE USO TU ",
             "Encontrado alojamiento obsoleto denominado: DALIAS, Nº 11"));
