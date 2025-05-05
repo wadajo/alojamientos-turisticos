@@ -166,12 +166,15 @@ class TurismoServiceTest {
             .thenReturn(Collections.singletonList(viviendaTuristicaDocument));
         when(hotelMongoRepository.findAll())
             .thenReturn(List.of(hotelDocument1, hotelDocument2));
+
         var result = turismoService.eliminarTodosLosAlojamientosObsoletosDeBbDd();
 
         verify(viviendaTuristicaMongoRepository).deleteAll(anyIterable());
         verify(hotelMongoRepository,never()).deleteAll(anyIterable());
         assertThat(result).isEqualTo("Han sido eliminados alojamientos.");
-        assertThat(output).contains("Encontrados 1 alojamientos obsoletos del tipo: VIVIENDAS DE USO TU ");
+        assertThat(output).contains(List.of(
+            "Encontrados 1 alojamiento(s) obsoleto(s) del tipo: VIVIENDAS DE USO TU ",
+            "Encontrado alojamiento obsoleto denominado: DALIAS, Nº 11"));
     }
 
     private static void setViviendaTuristicaDocumentValues(ViviendaTuristicaDocument viviendaTuristicaDocument) {
