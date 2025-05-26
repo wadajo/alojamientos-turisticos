@@ -24,6 +24,8 @@
         <jacoco.version>0.8.13</jacoco.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <error-prone.version>2.38.0</error-prone.version>
+        <nullaway.version>0.12.7</nullaway.version>
     </properties>
 
     <dependencies>
@@ -62,6 +64,16 @@
             <artifactId>commons-io</artifactId>
             <version>2.19.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.uber.nullaway</groupId>
+            <artifactId>nullaway</artifactId>
+            <version>${nullaway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.2.1-jre</version>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -96,12 +108,36 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <arg>-Xplugin:ErrorProne \
+                            -XepDisableAllChecks \
+                            -XepOpt:NullAway:OnlyNullMarked \
+                            -Xep:NullAway:ERROR \
+                            -XepOpt:NullAway:CustomContractAnnotations=org.springframework.lang.Contract \
+                        </arg>
+                    </compilerArgs>
                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.uber.nullaway</groupId>
+                            <artifactId>nullaway</artifactId>
+                            <version>${nullaway.version}</version>
+                        </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
                         </path>
+                        <!-- If 'annotationProcessorPaths' is set, processors will no longer be
+                        discovered on the regular -classpath; see also 'Using Error Prone
+                        together with other annotation processors' below. -->
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>

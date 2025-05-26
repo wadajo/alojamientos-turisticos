@@ -178,34 +178,34 @@ class TurismoServiceTest {
     }
 
     private static void setViviendaTuristicaDocumentValues(ViviendaTuristicaDocument viviendaTuristicaDocument) {
-        viviendaTuristicaDocument.via_tipo = ("CALLE");
-        viviendaTuristicaDocument.via_nombre = ("Dalias");
-        viviendaTuristicaDocument.numero = ("11");
-        viviendaTuristicaDocument.portal = ("");
-        viviendaTuristicaDocument.bloque = ("");
-        viviendaTuristicaDocument.planta = ("");
-        viviendaTuristicaDocument.puerta = ("");
-        viviendaTuristicaDocument.signatura = ("VT-1");
-        viviendaTuristicaDocument.denominacion = ("DALIAS, Nº 11");
-        viviendaTuristicaDocument.codpostal = ("28690");
-        viviendaTuristicaDocument.localidad = ("Brunete");
-        viviendaTuristicaDocument.alojamiento_tipo = ("VIVIENDAS DE USO TU ");
+        viviendaTuristicaDocument.via_tipo = "CALLE";
+        viviendaTuristicaDocument.via_nombre = "Dalias";
+        viviendaTuristicaDocument.numero = "11";
+        viviendaTuristicaDocument.portal = "";
+        viviendaTuristicaDocument.bloque = "";
+        viviendaTuristicaDocument.planta = "";
+        viviendaTuristicaDocument.puerta = "";
+        viviendaTuristicaDocument.signatura = "VT-1";
+        viviendaTuristicaDocument.denominacion = "DALIAS, Nº 11";
+        viviendaTuristicaDocument.codpostal = "28690";
+        viviendaTuristicaDocument.localidad = "Brunete";
+        viviendaTuristicaDocument.alojamiento_tipo = "VIVIENDAS DE USO TU ";
     }
 
     private static void setHotelDocumentValues(HotelDocument hotelDocument1, String numero, String denominacion) {
-        hotelDocument1.via_tipo = ("CALLE");
-        hotelDocument1.via_nombre = ("del Pez");
+        hotelDocument1.via_tipo = "CALLE";
+        hotelDocument1.via_nombre = "del Pez";
         hotelDocument1.numero = numero;
-        hotelDocument1.portal = ("");
-        hotelDocument1.bloque = ("");
-        hotelDocument1.planta = ("");
-        hotelDocument1.puerta = ("");
-        hotelDocument1.signatura = ("");
-        hotelDocument1.categoria = ("");
-        hotelDocument1.escalera = ("");
+        hotelDocument1.portal = "";
+        hotelDocument1.bloque = "";
+        hotelDocument1.planta = "";
+        hotelDocument1.puerta = "";
+        hotelDocument1.signatura = "";
+        hotelDocument1.categoria = "";
+        hotelDocument1.escalera = "";
         hotelDocument1.denominacion = denominacion;
-        hotelDocument1.codpostal = ("28012");
-        hotelDocument1.localidad = ("Madrid");
+        hotelDocument1.codpostal = "28012";
+        hotelDocument1.localidad = "Madrid";
         hotelDocument1.alojamiento_tipo = "HOTEL";
     }
 

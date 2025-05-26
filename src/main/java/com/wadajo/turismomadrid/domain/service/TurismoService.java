@@ -277,84 +277,84 @@ public class TurismoService {
             case ApartamentoRuralDocument apartamentoRuralDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ApartamentoRural(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             ) -> {
                 return esEquivalenteEsteDocumentAlRemoto(apartamentoRuralDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case ApartTuristicoDocument apartTuristicoDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ApartTuristico(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(apartTuristicoDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case CampingDocument campingDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Camping(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(campingDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case CasaHuespedesDocument casaHuespedesDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaHuespedes(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(casaHuespedesDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case CasaRuralDocument casaRuralDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.CasaRural(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(casaRuralDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case HostalDocument hostalDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hostal(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(hostalDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case HosteriaDocument hosteriaDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hosteria(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(hosteriaDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case HotelDocument hotelDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Hotel(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(hotelDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case HotelApartDocument hotelApartDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelApart(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(hotelApartDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case HotelRuralDocument hotelRuralDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.HotelRural(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(hotelRuralDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case PensionDocument pensionDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.Pension(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(pensionDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
             case ViviendaTuristicaDocument viviendaTuristicaDocument when alojamientoTuristicoRemoto instanceof AlojamientoTuristico.ViviendaTuristica(
                 String viaTipo, String viaNombre, String numero, String portal, String bloque, String planta,
                 String puerta, String signatura, String categoria, String escalera, String denominacion,
-                String cdpostal, String localidad, TipoAlojamiento ignored
+                String cdpostal, String localidad, _
             )  -> {
                 return esEquivalenteEsteDocumentAlRemoto(viviendaTuristicaDocument, viaTipo, viaNombre, numero, portal, bloque, planta, puerta, signatura, categoria, escalera, denominacion, cdpostal, localidad);
             }
