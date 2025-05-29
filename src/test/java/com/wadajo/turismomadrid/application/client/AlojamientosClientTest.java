@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.wadajo.turismomadrid.util.TestConstants.ALOJAMIENTOS_RAW_FILE;
+import static com.wadajo.turismomadrid.util.TestConstants.ALOJAMIENTOS_RAW_STUBBING_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RestClientTest(AlojamientosClient.class)
 @OverrideAutoConfiguration(enabled = true)
+@ActiveProfiles("test")
 class AlojamientosClientTest {
 
     @Autowired
@@ -33,7 +35,7 @@ class AlojamientosClientTest {
         server
             .expect(requestTo(""))
             .andRespond(withSuccess(
-                    new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_FILE)).toString(),
+                    new ObjectMapper().readTree(new File(ALOJAMIENTOS_RAW_STUBBING_FILE)).toString(),
                     MediaType.APPLICATION_JSON));
 
         var responseRaw = client.getResponseRaw();
