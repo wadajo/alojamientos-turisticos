@@ -7,21 +7,6 @@ type Mutation {
     borrarTodo: String
 }
 
-type AlojamientoTuristicoRaw {
-    alojamiento_tipo:String,
-    via_tipo:String,
-    via_nombre:String,
-    numero:String,
-    portal:String,
-    bloque:String
-    planta:String,
-    puerta:String,
-    escalera:String,
-    denominacion:String,
-    cdpostal:String,
-    localidad:String,
-}
-
 type AlojamientoTuristico {
     alojamiento_tipo:TipoAlojamiento,
     via_tipo:String,
@@ -31,6 +16,8 @@ type AlojamientoTuristico {
     bloque:String
     planta:String,
     puerta:String,
+    signatura:String,
+    categoria:String,
     escalera:String,
     denominacion:String,
     cdpostal:String,
