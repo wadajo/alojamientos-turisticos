@@ -1,10 +1,11 @@
 package com.wadajo.turismomadrid.acceptance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wadajo.turismomadrid.application.repository.*;
 import com.wadajo.turismomadrid.domain.document.*;
 import com.wadajo.turismomadrid.domain.dto.cmadrid.AlojamientosTuristicosResponseDto;
 import com.wadajo.turismomadrid.domain.model.AlojamientoTuristico;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.svenkubiak.embeddedmongodb.EmbeddedMongoDB;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,9 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.wadajo.turismomadrid.infrastructure.util.Utils.convertFromRaw;
@@ -55,18 +56,26 @@ class TurismoDbTest {
 
     @BeforeEach
     void setUp() {
-        apartamentoRuralMongoRepository.deleteAll();
-        apartTuristicoMongoRepository.deleteAll();
-        campingMongoRepository.deleteAll();
-        casaHuespedesMongoRepository.deleteAll();
-        casaRuralMongoRepository.deleteAll();
-        hostalMongoRepository.deleteAll();
-        hosteriaMongoRepository.deleteAll();
-        hotelMongoRepository.deleteAll();
-        hotelApartMongoRepository.deleteAll();
-        hotelRuralMongoRepository.deleteAll();
-        pensionMongoRepository.deleteAll();
-        viviendaTuristicaMongoRepository.deleteAll();
+        EmbeddedMongoDB embeddedMongoDB = EmbeddedMongoDB.create()
+            .withHost("localhost")
+            .withPort(27019)
+            .withVersion(Version.Main.V8_0)
+            .start();
+
+        if (embeddedMongoDB.isActive()) {
+            apartamentoRuralMongoRepository.deleteAll();
+            apartTuristicoMongoRepository.deleteAll();
+            campingMongoRepository.deleteAll();
+            casaHuespedesMongoRepository.deleteAll();
+            casaRuralMongoRepository.deleteAll();
+            hostalMongoRepository.deleteAll();
+            hosteriaMongoRepository.deleteAll();
+            hotelMongoRepository.deleteAll();
+            hotelApartMongoRepository.deleteAll();
+            hotelRuralMongoRepository.deleteAll();
+            pensionMongoRepository.deleteAll();
+            viviendaTuristicaMongoRepository.deleteAll();
+        }
     }
     @Test
     void funcionaElMongoTemplate(@Autowired final MongoTemplate mongoTemplate) {
@@ -98,8 +107,8 @@ class TurismoDbTest {
     }
 
     @Test
-    void debeGuardarAlojamientosEnBbDd() throws IOException {
-        var alojamientosRawUpdated = new ObjectMapper().readValue(new File(ALOJAMIENTOS_RAW_UPDATED_STUBBING_FILE), AlojamientosTuristicosResponseDto.class);
+    void debeGuardarAlojamientosEnBbDd() {
+        var alojamientosRawUpdated = new JsonMapper().readValue(new File(ALOJAMIENTOS_RAW_UPDATED_STUBBING_FILE), AlojamientosTuristicosResponseDto.class);
         var listaRaw = alojamientosRawUpdated.data();
         var lista=convertFromRaw(listaRaw);
 
